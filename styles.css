@@ -74,27 +74,27 @@ body {
 }
 
 .air-raid {
-    background-image: url('/static/img/a2.png');
+    background-image: url('static/img/a2.png');
 }
 
 .ambulance {
-    background-image: url('/static/img/a3.png');
+    background-image: url('static/img/a3.png');
 }
 
 .fire-truck {
-    background-image: url('/static/img/a4.png');
+    background-image: url('static/img/a4.png');
 }
 
 .police1 {
-    background-image: url('/static/img/a5.png');
+    background-image: url('static/img/a5.png');
 }
 
 .police2 {
-    background-image: url('/static/img/a5.png');
+    background-image: url('static/img/a5.png');
 }
 
 .warning {
-    background-image: url('/static/img/w_warning_light_off.png');
+    background-image: url('static/img/w_warning_light_off.png');
 }
 
 /* 闪烁动画 */
@@ -113,7 +113,7 @@ body {
 }
 
 .warning.active {
-    background-image: url('/static/img/w_warning_light_on.png');
+    background-image: url('static/img/w_warning_light_on.png');
 }
 
 .siren-item p {

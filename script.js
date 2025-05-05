@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 预加载音频文件
         if (soundFile) {
-            fetch(`/static/music/${soundFile}`)
+            fetch(`static/music/${soundFile}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
