@@ -1,0 +1,130 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+.controls {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.mute-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mute-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sirens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.siren-item {
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.siren-item:hover {
+    transform: scale(1.02);
+}
+
+.siren-item.active {
+    background-color: #3a3a3a;
+}
+
+.light {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.air-raid {
+    background-image: url('/static/img/a2.png');
+}
+
+.ambulance {
+    background-image: url('/static/img/a3.png');
+}
+
+.fire-truck {
+    background-image: url('/static/img/a4.png');
+}
+
+.police1 {
+    background-image: url('/static/img/a5.png');
+}
+
+.police2 {
+    background-image: url('/static/img/a5.png');
+}
+
+.warning {
+    background-image: url('/static/img/w_warning_light_off.png');
+}
+
+/* 闪烁动画 */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.light.active {
+    animation: blink 0.5s infinite;
+}
+
+.warning.active {
+    background-image: url('/static/img/w_warning_light_on.png');
+}
+
+.siren-item p {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #fff;
+} 
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #888;
+}
+

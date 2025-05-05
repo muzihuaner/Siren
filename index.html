@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>警报器模拟器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>警报器模拟器</h1>
+        </div>
+        <div class="controls">
+            <button id="muteButton" class="mute-button">
+                <span class="mute-icon">🔊</span>
+            </button>
+        </div>
+        
+        <div class="sirens-grid">
+            <div class="siren-item" data-sound="alarm.mp3">
+                <div class="light air-raid"></div>
+                <p>防空警报</p>
+            </div>
+            
+            <div class="siren-item" data-sound="ambulance.mp3">
+                <div class="light ambulance"></div>
+                <p>救护车警报</p>
+            </div>
+            
+            <div class="siren-item" data-sound="fire.mp3">
+                <div class="light fire-truck"></div>
+                <p>消防车警报</p>
+            </div>
+            
+            <div class="siren-item" data-sound="police1.mp3">
+                <div class="light police1"></div>
+                <p>警车警报1</p>
+            </div>
+            
+            <div class="siren-item" data-sound="police2.mp3">
+                <div class="light police2"></div>
+                <p>警车警报2</p>
+            </div>
+            
+            <div class="siren-item" data-sound="warning.mp3">
+                <div class="light warning"></div>
+                <p>路边警告灯</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>本网站仅供娱乐学习使用，切勿用于非法用途，后果自负！</p>
+        </div>
+    </div>
+   
+    <script src="script.js"></script>
+</body>
+</html> 
