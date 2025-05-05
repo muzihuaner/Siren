@@ -63,6 +63,8 @@ Siren/
 
 ## 许可证
 
+本应用基于 安卓警用报警器（com.policealarm.yixiang）重构
+
 本项目基于 MIT 许可证开源。
 
 Copyright (c) 2025 muzihuaner 
