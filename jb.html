@@ -1,0 +1,2858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title id="pageTitle">手机警报器</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none
+    }
+
+    html {
+      min-height: 100%
+    }
+
+    :root {
+      --glow1: rgba(0, 110, 255, .30);
+      --glow2: rgba(0, 200, 255, .16);
+      --glow3: rgba(80, 120, 255, .14);
+      --base1: #070c16;
+      --base2: #04060c;
+      --cardbg: #0b1220;
+      --gloss: rgba(255, 255, 255, .055);
+      --line: rgba(120, 170, 255, .16);
+      --txt: #e6eefc;
+      --dim: #8ea3c4;
+      --accent: #4da3ff;
+      --accentTxt: #04121f;
+      --headtop: rgba(120, 170, 255, .055);
+      --sectop: rgba(120, 170, 255, .07);
+      --secbot: rgba(120, 170, 255, .018);
+      --secline: rgba(120, 170, 255, .13);
+      --btn1: #161f31;
+      --btn2: #101725;
+      --btnline: rgba(120, 170, 255, .14);
+      --btntxt: #a8bcda;
+      --btnsub: rgba(168, 188, 218, .62);
+      --btngloss: rgba(255, 255, 255, .07);
+      --ledoff: #1c2436;
+      --ledready: #30d158;
+      --ledactive: #4da3ff;
+      --tkText: #0b0e14;
+      --accentA: #69b1ff;
+      --accentB: #438fe0;
+      --sirenA: #438ae3;
+      --sirenB: #184174;
+      --sirenC: #92bbee;
+      --sirenG: rgba(47, 125, 224, 0.5);
+      --dualA: #956cf6;
+      --dualB: #472f7f;
+      --dualC: #c2aafa;
+      --dualG: rgba(138, 92, 246, 0.5);
+      --autoA: #27bfcd;
+      --autoB: #085f68;
+      --autoC: #82dae2;
+      --autoG: rgba(16, 184, 200, 0.5);
+      --lightA: #ffa842;
+      --lightB: #845217;
+      --lightC: #ffcd92;
+      --lightG: rgba(255, 159, 46, 0.5);
+      --manualA: #ffb939;
+      --manualB: #845c12;
+      --manualC: #ffd68d;
+      --manualG: rgba(255, 178, 36, 0.5);
+      --hornA: #ff564a;
+      --hornB: #84231c;
+      --hornC: #ff9d96;
+      --hornG: rgba(255, 68, 54, 0.5);
+      --micA: #42c888;
+      --micB: #17643f;
+      --micC: #92dfba;
+      --micG: rgba(46, 194, 123, 0.5);
+      --stopA: #e33636;
+      --stopB: #741010;
+      --stopC: #ee8b8b;
+      --stopG: rgba(224, 32, 32, 0.5);
+      --howlerA: #ff9535;
+      --howlerB: #844710;
+      --howlerC: #ffc28a;
+      --howlerG: rgba(255, 138, 31, 0.5);
+      --utilA: #49b078;
+      --utilB: #1b5737;
+      --utilC: #95d1b1;
+      --utilG: rgba(53, 168, 106, 0.5);
+      --tkA: #eff5ff;
+      --tkB: #7b7e84;
+      --tkC: #f6f9ff;
+      --tkG: rgba(238, 244, 255, 0.5);
+    }
+
+    body {
+      margin: 0;
+      padding:
+        calc(env(safe-area-inset-top, 0px) + 10px) 10px calc(env(safe-area-inset-bottom, 0px) + 10px) calc(env(safe-area-inset-left, 0px) + 34px);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Roboto, sans-serif;
+      color: var(--txt);
+      background:
+        radial-gradient(900px 620px at 12% -8%, var(--glow1), transparent 62%),
+        radial-gradient(760px 520px at 92% 2%, var(--glow2), transparent 60%),
+        radial-gradient(760px 640px at 50% 110%, var(--glow3), transparent 62%),
+        linear-gradient(180deg, var(--base1) 0%, var(--base2) 100%);
+      background-attachment: fixed;
+    }
+
+    /* ================= 主机外壳 ================= */
+    .console {
+      width: 100%;
+      max-width: 470px;
+      border-radius: 26px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--gloss), rgba(255, 255, 255, 0) 45%), var(--cardbg);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .75), 0 1px 0 rgba(255, 255, 255, .06) inset, 0 0 0 1px rgba(0, 0, 0, .45);
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    /* ================= 警示灯条（屏幕左侧竖贯） ================= */
+    .lightbar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 0;
+      background: none;
+      border: none;
+    }
+
+    .light-led {
+      flex: 1;
+      width: 14px;
+      border-radius: 8px;
+      background: #151922;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, .9), inset 0 -1px 0 rgba(255, 255, 255, .03);
+      transition: background .04s linear, box-shadow .04s linear;
+    }
+
+    .light-led.blue.on {
+      background: linear-gradient(180deg, #5ab0ff, #0060df);
+      box-shadow: 0 0 14px #0a84ff, 0 0 32px rgba(10, 132, 255, .85)
+    }
+
+    .light-led.amber.on {
+      background: linear-gradient(180deg, #ffc65c, #ff9500);
+      box-shadow: 0 0 14px #ff9f0a, 0 0 32px rgba(255, 159, 10, .85)
+    }
+
+    .light-led.white.on {
+      background: linear-gradient(180deg, #ffffff, #dde6f4);
+      box-shadow: 0 0 16px #ffffff, 0 0 36px rgba(255, 255, 255, .95)
+    }
+
+    .light-led.red.on {
+      background: linear-gradient(180deg, #ff6a5e, #e01f1f);
+      box-shadow: 0 0 14px #ff3b30, 0 0 32px rgba(255, 59, 48, .9)
+    }
+
+    /* ================= 头部 ================= */
+    .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 16px 12px;
+      background: linear-gradient(180deg, var(--headtop), rgba(255, 255, 255, 0));
+      border-bottom: 1px solid var(--secline);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex: 1;
+      min-width: 0
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: var(--sectop);
+      border: 1px solid var(--secline);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      color: var(--dim);
+      white-space: nowrap;
+    }
+
+    .led {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex: none;
+      background: #39414f;
+      transition: background .15s, box-shadow .15s;
+    }
+
+    .led.ready {
+      background: var(--ledready);
+      box-shadow: 0 0 8px var(--ledready)
+    }
+
+    .led.active {
+      background: var(--ledactive);
+      box-shadow: 0 0 10px var(--ledactive)
+    }
+
+    .brand-name {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 1.6px;
+      color: var(--txt);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 屏幕左侧灯带槽 */
+    .rail {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 27px;
+      z-index: 60;
+      display: flex;
+      align-items: stretch;
+      padding: calc(env(safe-area-inset-top, 0px) + 7px) 0 calc(env(safe-area-inset-bottom, 0px) + 7px) 6px;
+      background: linear-gradient(90deg, rgba(0, 0, 0, .6), rgba(0, 0, 0, .15));
+      border-right: 1px solid var(--secline);
+      box-shadow: 3px 0 14px rgba(0, 0, 0, .5);
+      pointer-events: none;
+    }
+
+    /* ================= 分区 ================= */
+    .content {
+      padding: 12px 12px 16px
+    }
+
+    .sec {
+      margin-bottom: 11px;
+      padding: 12px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, var(--sectop), var(--secbot));
+      border: 1px solid var(--secline);
+    }
+
+    .sec:last-child {
+      margin-bottom: 0
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px
+    }
+
+    .sec-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex: none;
+      background: var(--accent);
+      box-shadow: 0 0 9px var(--accent);
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.3px;
+      color: var(--txt);
+      opacity: .88;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px
+    }
+
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px
+    }
+
+    /* ================= 按钮 ================= */
+    .btn {
+      position: relative;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.15;
+      padding: 8px 6px;
+      color: var(--btntxt);
+      background: linear-gradient(180deg, var(--btn1), var(--btn2));
+      border: 1px solid var(--btnline);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .05) inset, 0 6px 14px rgba(0, 0, 0, .45);
+      touch-action: none;
+      transition: transform .06s ease, box-shadow .14s ease, background .14s ease, color .14s ease;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 52%;
+      background: linear-gradient(180deg, var(--btngloss), rgba(255, 255, 255, 0));
+      pointer-events: none;
+    }
+
+    .btn:active,
+    .btn.pressed {
+      transform: scale(.965);
+      filter: brightness(1.18)
+    }
+
+    .btn .sub {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--btnsub);
+      margin-top: 4px;
+      letter-spacing: .2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* 气笛 / 广播 */
+    .btn-horn {
+      height: 78px;
+      font-size: 16px;
+      background: linear-gradient(180deg, #2c1a1e, #1a1014);
+      color: #ff9d9d;
+      border-color: rgba(255, 80, 80, .2);
+    }
+
+    .btn-horn.pressed {
+      background: linear-gradient(180deg, var(--hornA), var(--hornB));
+      color: #fff;
+      border-color: var(--hornC);
+      box-shadow: 0 6px 24px var(--hornG), 0 0 26px var(--hornG);
+    }
+
+    .btn-mic {
+      height: 78px;
+      font-size: 16px;
+      background: linear-gradient(180deg, #132a24, #0d1a17);
+      color: #6ee7a8;
+      border-color: rgba(30, 215, 96, .2);
+    }
+
+    .btn-mic.pressed {
+      background: linear-gradient(180deg, var(--micA), var(--micB));
+      color: #03130a;
+      border-color: var(--micC);
+      box-shadow: 0 6px 24px var(--micG), 0 0 26px var(--micG);
+    }
+
+    /* 灯组 */
+    .btn-lightmode {
+      height: 56px;
+      font-size: 11.5px;
+      background: linear-gradient(180deg, #241c14, #150f0a);
+      color: #ffab6b;
+      border-color: rgba(255, 140, 60, .18);
+    }
+
+    .btn-lightmode.active {
+      background: linear-gradient(180deg, var(--lightA), var(--lightB));
+      color: #fff;
+      border-color: var(--lightC);
+      box-shadow: 0 6px 18px var(--lightG), 0 0 20px var(--lightG);
+    }
+
+    .btn-takedown {
+      height: 56px;
+      font-size: 11.5px;
+      background: linear-gradient(180deg, #1c2436, #131a28);
+      color: #dbe4f5;
+      border-color: rgba(160, 190, 240, .18);
+    }
+
+    .btn-takedown.active {
+      background: linear-gradient(180deg, var(--tkA), var(--tkB));
+      color: var(--tkText);
+      border-color: var(--tkC);
+      box-shadow: 0 6px 20px var(--tkG), 0 0 22px var(--tkG);
+    }
+
+    /* 手动电笛 */
+    .btn-manual {
+      height: 68px;
+      font-size: 14px;
+      background: linear-gradient(180deg, #2a2415, #191510);
+      color: #ffd166;
+      border-color: rgba(255, 190, 60, .18);
+    }
+
+    .btn-manual.pressed {
+      background: linear-gradient(180deg, var(--manualA), var(--manualB));
+      color: #1a1204;
+      border-color: var(--manualC);
+      box-shadow: 0 6px 22px var(--manualG), 0 0 24px var(--manualG);
+    }
+
+    /* 单音警报 */
+    .btn-siren {
+      height: 62px;
+      font-size: 13px;
+      background: linear-gradient(180deg, var(--btn1), var(--btn2));
+      color: var(--btntxt);
+      border-color: var(--btnline);
+    }
+
+    .btn-siren.active {
+      background: linear-gradient(180deg, var(--sirenA), var(--sirenB));
+      color: #fff;
+      border-color: var(--sirenC);
+      box-shadow: 0 6px 20px var(--sirenG), 0 0 24px var(--sirenG);
+    }
+
+    /* 自动轮换 */
+    .btn-auto {
+      height: 62px;
+      font-size: 13px;
+      background: linear-gradient(180deg, #10262c, #0a1a1f);
+      color: #5fd8e8;
+      border-color: rgba(40, 200, 220, .18);
+    }
+
+    .btn-auto.active {
+      background: linear-gradient(180deg, var(--autoA), var(--autoB));
+      color: #fff;
+      border-color: var(--autoC);
+      box-shadow: 0 6px 20px var(--autoG), 0 0 24px var(--autoG);
+    }
+
+    /* 双音并发 */
+    .btn-dual {
+      height: 62px;
+      font-size: 13px;
+      background: linear-gradient(180deg, #221a38, #150f24);
+      color: #c4a8ff;
+      border-color: rgba(150, 110, 255, .2);
+    }
+
+    .btn-dual.active {
+      background: linear-gradient(180deg, var(--dualA), var(--dualB));
+      color: #fff;
+      border-color: var(--dualC);
+      box-shadow: 0 6px 20px var(--dualG), 0 0 24px var(--dualG);
+    }
+
+    /* 系统控制 */
+    .btn-howler {
+      height: 62px;
+      font-size: 12.5px;
+      background: linear-gradient(180deg, #2e1f0d, #1b1107);
+      color: #ffb066;
+      border-color: rgba(255, 140, 40, .2);
+    }
+
+    .btn-howler.armed {
+      background: linear-gradient(180deg, var(--howlerB), rgba(0, 0, 0, .35));
+      color: var(--howlerC);
+      border-color: var(--howlerC);
+      box-shadow: 0 0 16px var(--howlerG);
+    }
+
+    .btn-howler.active {
+      background: linear-gradient(180deg, var(--howlerA), var(--howlerB));
+      color: #fff;
+      border-color: var(--howlerC);
+      box-shadow: 0 6px 22px var(--howlerG), 0 0 26px var(--howlerG);
+    }
+
+    .btn-util {
+      height: 62px;
+      font-size: 12.5px;
+      background: linear-gradient(180deg, var(--btn1), var(--btn2));
+      color: var(--btntxt);
+      border-color: var(--btnline);
+    }
+
+    .btn-util.active {
+      background: linear-gradient(180deg, var(--utilA), var(--utilB));
+      color: #eaffd6;
+      border-color: var(--utilC);
+      box-shadow: 0 6px 20px var(--utilG), 0 0 22px var(--utilG);
+    }
+
+    .btn-stop {
+      height: 62px;
+      font-size: 12.5px;
+      background: linear-gradient(180deg, #301616, #1d0f0f);
+      color: #ff8a80;
+      border-color: rgba(255, 70, 60, .22);
+    }
+
+    .btn-stop:active {
+      background: linear-gradient(180deg, var(--stopA), var(--stopB));
+      color: #fff;
+      border-color: var(--stopC);
+      box-shadow: 0 6px 22px var(--stopG), 0 0 24px var(--stopG);
+    }
+
+    /* ================= 免责声明 ================= */
+    .disclaimer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(3, 5, 9, .88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 9999999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .disclaimer-card {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 26px;
+      padding: 24px 20px 20px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--gloss), rgba(255, 255, 255, 0) 45%), var(--cardbg);
+      box-shadow: 0 34px 90px rgba(0, 0, 0, .85);
+    }
+
+    .disc-icon {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 14px;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(77, 163, 255, .16);
+      border: 1px solid rgba(77, 163, 255, .4);
+      box-shadow: 0 0 26px rgba(77, 163, 255, .3);
+    }
+
+    .disc-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1.4px;
+      color: var(--txt);
+      margin-bottom: 12px;
+    }
+
+    .disclaimer-body {
+      font-size: 13.5px;
+      color: var(--dim);
+      line-height: 1.85;
+      text-align: justify;
+      font-weight: 600;
+      margin-bottom: 22px;
+      letter-spacing: .3px;
+    }
+
+    .disclaimer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .btn-disc-agree {
+      padding: 13px 0;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid var(--micC);
+      background: linear-gradient(180deg, rgba(46, 194, 123, .22), rgba(46, 194, 123, .06));
+      color: #7ee2a8;
+      transition: transform .06s, background .12s;
+    }
+
+    .btn-disc-agree:active {
+      transform: scale(.97);
+      background: linear-gradient(180deg, var(--micA), var(--micB));
+      color: #03130a;
+    }
+
+    .btn-disc-refuse {
+      padding: 13px 0;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid var(--stopC);
+      background: linear-gradient(180deg, rgba(224, 32, 32, .22), rgba(224, 32, 32, .06));
+      color: #ff9a9a;
+      transition: transform .06s, background .12s;
+    }
+
+    .btn-disc-refuse:active {
+      transform: scale(.97);
+      background: linear-gradient(180deg, var(--stopA), var(--stopB));
+      color: #fff;
+    }
+
+    /* ================= 模态弹窗 ================= */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(4, 6, 10, .72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 9999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 18px;
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 24px;
+      padding: 20px 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--gloss), rgba(255, 255, 255, 0) 45%), var(--cardbg);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, .8);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--secline);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+
+    .modal-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: .8px
+    }
+
+    .btn-close {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--sectop);
+      border: 1px solid var(--secline);
+      color: var(--dim);
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-close:active {
+      background: rgba(255, 255, 255, .18);
+      color: var(--txt)
+    }
+
+    .seg {
+      display: inline-flex;
+      gap: 3px;
+      padding: 3px;
+      background: rgba(0, 0, 0, .35);
+      border: 1px solid var(--secline);
+      border-radius: 12px;
+    }
+
+    .seg button {
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      border: none;
+      background: transparent;
+      color: var(--dim);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: background .12s, color .12s;
+    }
+
+    .seg button.active {
+      background: linear-gradient(180deg, var(--accentA), var(--accent));
+      color: var(--accentTxt);
+      box-shadow: 0 2px 8px var(--accent);
+    }
+
+    .slider-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+      color: var(--txt);
+      font-weight: 700;
+    }
+
+    .slider-row:last-child {
+      margin-bottom: 0
+    }
+
+    .slider-row>span:first-child {
+      flex: 1;
+      min-width: 0;
+      opacity: .9
+    }
+
+    .slider-row input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 118px;
+      height: 5px;
+      border-radius: 3px;
+      flex: none;
+      background: linear-gradient(90deg, var(--accentA), var(--accent));
+      outline: none;
+      cursor: pointer;
+    }
+
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, .12);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .6);
+      cursor: pointer;
+    }
+
+    .slider-row input[type=range]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, .12);
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .6);
+      cursor: pointer;
+    }
+
+    .slider-val {
+      width: 52px;
+      text-align: right;
+      flex: none;
+      color: var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px;
+    }
+
+    .btn-reset-defaults {
+      width: 100%;
+      margin-top: 18px;
+      padding: 12px 0;
+      border-radius: 13px;
+      cursor: pointer;
+      border: 1px solid var(--stopC);
+      background: linear-gradient(180deg, rgba(224, 32, 32, .2), rgba(224, 32, 32, .06));
+      color: #ff8f8f;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      transition: transform .06s, background .12s;
+    }
+
+    .btn-reset-defaults:active {
+      transform: scale(.98);
+      background: linear-gradient(180deg, var(--stopA), var(--stopB));
+      color: #fff;
+      border-color: var(--stopC);
+    }
+
+    /* ================= Toast ================= */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 34px;
+      transform: translateX(-50%) translateY(10px);
+      padding: 11px 18px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, var(--gloss), rgba(255, 255, 255, 0) 45%), var(--cardbg);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--txt);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, .7);
+      z-index: 99999999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .22s, transform .22s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    /* ====== 美化增强(追加,不动原规则) ====== */
+    /* 顶部站点返回条 */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: linear-gradient(180deg, rgba(10, 16, 28, .9), rgba(10, 16, 28, .72));
+      border-bottom: 1px solid rgba(120, 170, 255, .14);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px)
+    }
+
+    .site-nav .slogo {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      flex: none;
+      object-fit: cover;
+      background: #0a1428;
+      box-shadow: 0 0 10px rgba(77, 163, 255, .35)
+    }
+
+    .site-nav .scri {
+      font-size: 12px;
+      font-weight: 700;
+      color: #cfe2ff;
+      letter-spacing: .4px;
+      white-space: nowrap
+    }
+
+    .site-nav .scrum {
+      font-size: 11px;
+      color: #7f92b8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .site-nav .back {
+      margin-left: auto;
+      flex: none;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0a1428;
+      background: linear-gradient(135deg, #4da3ff, #6db8ff);
+      padding: 7px 16px;
+      border-radius: 999px;
+      box-shadow: 0 2px 12px rgba(77, 163, 255, .4);
+      transition: .15s
+    }
+
+    .site-nav .back:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px)
+    }
+
+    /* console 下移让开顶部条 */
+    body {
+      padding-top: calc(env(safe-area-inset-top, 0px) + 60px)
+    }
+
+    /* 分区标题增强:左边图标胶囊 + 底部细分隔线 */
+    .sec-head {
+      position: relative
+    }
+
+    .sec-head::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -10px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(120, 170, 255, .35), rgba(120, 170, 255, .03) 70%, transparent)
+    }
+
+    .sec-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px currentColor
+    }
+
+    /* 各分区不同色点 */
+    .sec:nth-child(1) .sec-dot {
+      background: #ffd166;
+      color: #ffd166
+    }
+
+    .sec:nth-child(2) .sec-dot {
+      background: #4da3ff;
+      color: #4da3ff
+    }
+
+    .sec:nth-child(3) .sec-dot {
+      background: #ff9f43;
+      color: #ff9f43
+    }
+
+    .sec:nth-child(4) .sec-dot {
+      background: #20c997;
+      color: #20c997
+    }
+
+    .sec:nth-child(5) .sec-dot {
+      background: #ff6b6b;
+      color: #ff6b6b
+    }
+
+    .sec:nth-child(6) .sec-dot {
+      background: #c084fc;
+      color: #c084fc
+    }
+
+    .sec:nth-child(7) .sec-dot {
+      background: #e879f9;
+      color: #e879f9
+    }
+
+    .sec:nth-child(8) .sec-dot {
+      background: #94a3b8;
+      color: #94a3b8
+    }
+
+    /* 按钮 hover 上浮 */
+    .btn {
+      transition: transform .14s, box-shadow .2s, background .2s, border-color .2s, opacity .2s
+    }
+
+    .btn:hover {
+      transform: translateY(-2px)
+    }
+
+    /* 状态徽章发光 */
+    .status-pill {
+      box-shadow: 0 0 12px rgba(77, 163, 255, .12)
+    }
+
+    /* 免责卡片精修 */
+    .disc-icon {
+      box-shadow: 0 0 22px rgba(255, 159, 10, .28);
+      border-radius: 16px
+    }
+
+    .btn-disc-agree {
+      box-shadow: 0 4px 18px rgba(77, 163, 255, .35)
+    }
+  </style>
+  </style>
+</head>
+
+<body>
+  <div class="site-nav">
+    <span class="scri">手机警报器</span>
+
+  </div>
+
+
+  <div class="disclaimer-overlay" id="disclaimerModal">
+    <div class="disclaimer-card">
+      <div class="disc-icon">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3.6 1.9 20.4h20.2L12 3.6Z" stroke="#ff9f0a" stroke-width="1.8" stroke-linejoin="round" />
+          <path d="M12 9.6v4.9" stroke="#ff9f0a" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="12" cy="17.5" r="1.05" fill="#ff9f0a" />
+        </svg>
+      </div>
+      <div class="disc-title">使用声明 · DISCLAIMER</div>
+      <div class="disclaimer-body" id="tDiscBody">
+        本软件仅供娱乐与技术学习，严禁在道路、商场、公园、居民区等公共场所播放，严禁用于冒充特种车辆等违法行为，违者后果自负。
+      </div>
+      <div class="disclaimer-actions">
+        <button class="btn-disc-agree" id="btnDiscAgree">同意并进入</button>
+        <button class="btn-disc-refuse" id="btnDiscRefuse">拒绝并退出</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="rail">
+    <div class="lightbar" id="lightBar">
+      <div class="light-led blue" id="led0"></div>
+      <div class="light-led blue" id="led1"></div>
+      <div class="light-led blue" id="led2"></div>
+      <div class="light-led amber" id="led3"></div>
+      <div class="light-led white" id="led4"></div>
+      <div class="light-led white" id="led5"></div>
+      <div class="light-led amber" id="led6"></div>
+      <div class="light-led red" id="led7"></div>
+      <div class="light-led red" id="led8"></div>
+      <div class="light-led red" id="led9"></div>
+    </div>
+  </div>
+
+  <div class="console">
+    <div class="head">
+      <div class="brand">
+        <span class="brand-name" id="tBrandName">手机警报器</span>
+      </div>
+      <div class="status-pill"><span class="led ready" id="sysLed"></span><span id="txtStatus">系统就绪</span></div>
+    </div>
+
+    <div class="content">
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec1">号角与广播</span></div>
+        <div class="grid-2">
+          <button class="btn btn-horn" id="btnHorn"><span id="tBtnHorn">气笛号角</span><span class="sub"
+              id="tSubHorn">点按触发</span></button>
+          <button class="btn btn-mic" id="btnMic"><span id="tBtnMic">车外广播</span><span class="sub"
+              id="micSubTxt">按住录音</span></button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec2">战术警灯</span></div>
+        <div class="grid-5">
+          <button class="btn btn-lightmode active" id="btnLgtAuto"><span id="tBtnAutoLgt">自动联动</span><span class="sub"
+              id="tSubAutoLgt">随动</span></button>
+          <button class="btn btn-lightmode" id="btnLgtM1"><span id="tBtnM1">模式 1</span><span class="sub"
+              id="tSubM1">示宽</span></button>
+          <button class="btn btn-lightmode" id="btnLgtM2"><span id="tBtnM2">模式 2</span><span class="sub"
+              id="tSubM2">双爆</span></button>
+          <button class="btn btn-lightmode" id="btnLgtM3"><span id="tBtnM3">模式 3</span><span class="sub"
+              id="tSubM3">大循环</span></button>
+          <button class="btn btn-takedown" id="btnStopLight"><span id="tBtnStopLgt">拦停检车</span><span class="sub"
+              id="tSubStopLgt">前射灯</span></button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec3">手动电笛</span></div>
+        <div class="grid-2">
+          <button class="btn btn-manual" id="btnManualHigh"><span id="tBtnManHigh">高音电笛</span><span class="sub"
+              id="tSubManHigh">长按爬升 / 松开滑落</span></button>
+          <button class="btn btn-manual" id="btnManualLow"><span id="tBtnManLow">低音电笛</span><span class="sub"
+              id="tSubManLow">长按爬升 / 飞轮拖尾</span></button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec4">巡航警报</span></div>
+        <div class="grid-3">
+          <button class="btn btn-siren" data-siren="wail"><span id="tBtnWail">巡航 Wail</span><span class="sub"
+              id="tSubWail">标准</span></button>
+          <button class="btn btn-siren" data-siren="wail_slow"><span id="tBtnWailSlow">慢速 Wail</span><span class="sub"
+              id="tSubWailSlow">慢速</span></button>
+          <button class="btn btn-siren" data-siren="wail_fast"><span id="tBtnWailFast">快速 Wail</span><span class="sub"
+              id="tSubWailFast">快速</span></button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec5">急促警报</span></div>
+        <div class="grid-3">
+          <button class="btn btn-siren" data-siren="yelp"><span id="tBtnYelp">急促 Yelp</span><span class="sub"
+              id="tSubYelp">急促</span></button>
+          <button class="btn btn-siren" data-siren="priority"><span id="tBtnPriority">追击变频</span><span class="sub"
+              id="tSubPriority">追击</span></button>
+          <button class="btn btn-siren" data-siren="phaser"><span id="tBtnPhaser">极速穿透</span><span class="sub"
+              id="tSubPhaser">极速</span></button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec6">特种与轮换</span></div>
+        <div class="grid-3">
+          <button class="btn btn-siren" data-siren="warble"><span id="tBtnWarble">战术颤音</span><span class="sub"
+              id="tSubWarble">高频颤音</span></button>
+          <button class="btn btn-siren" data-siren="hilo"><span id="tBtnHilo">救护 Hi-Lo</span><span class="sub"
+              id="tSubHilo">救护双音</span></button>
+          <button class="btn btn-auto" id="btnAutoCycle"><span id="tBtnAuto">自动</span><span class="sub"
+              id="autoSubText">随机轮换</span></button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec7">双音并发</span></div>
+        <div class="grid-2">
+          <button class="btn btn-dual" data-dual="wail,yelp"><span id="tBtnDualA">并发 A</span><span class="sub"
+              id="tSubDualA">巡航 + 急促</span></button>
+          <button class="btn btn-dual" data-dual="yelp,warble"><span id="tBtnDualB">并发 B</span><span class="sub"
+              id="tSubDualB">急促 + 颤音</span></button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><span class="sec-dot"></span><span class="section-tag" id="tSec8">系统控制</span></div>
+        <div class="grid-4">
+          <button class="btn btn-howler" id="btnHowler"><span id="tBtnSubPulse">重低音脉冲</span><span class="sub"
+              id="rumblerSubText">点击开启</span></button>
+          <button class="btn btn-util" id="btnSettings"><span id="tBtnSet">系统设置</span><span class="sub"
+              id="tSubSet">调音设置</span></button>
+          <button class="btn btn-util" id="btnLowPower"><span id="tBtnLowPwr">低功率</span><span
+              class="sub">-12dB</span></button>
+          <button class="btn btn-stop" id="btnStop"><span id="tBtnSilent">静音</span><span class="sub"
+              id="tSubSilent">一键全停</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-title" id="tSetTitle">系统设置与全局均衡</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="seg">
+            <button id="btnLangZh">中文</button>
+            <button id="btnLangEn">EN</button>
+          </div>
+          <button class="btn-close" id="btnCloseModal">&#10005;</button>
+        </div>
+      </div>
+      <div class="slider-row">
+        <span id="tSetReverb">全局混响 (0 - 100%)</span>
+        <input type="range" id="rngReverb" min="0" max="1.0" step="0.01" value="0.20">
+        <span class="slider-val" id="valReverb">20%</span>
+      </div>
+      <div class="slider-row">
+        <span id="tSetLow">全局低音 (180Hz)</span>
+        <input type="range" id="rngLow" min="-18" max="18" step="1" value="4">
+        <span class="slider-val" id="valLow">+4dB</span>
+      </div>
+      <div class="slider-row">
+        <span id="tSetMid">全局中音 (1000Hz)</span>
+        <input type="range" id="rngMid" min="-18" max="18" step="1" value="2">
+        <span class="slider-val" id="valMid">+2dB</span>
+      </div>
+      <div class="slider-row">
+        <span id="tSetHigh">全局高音 (4000Hz)</span>
+        <input type="range" id="rngHigh" min="-18" max="18" step="1" value="0">
+        <span class="slider-val" id="valHigh">0dB</span>
+      </div>
+      <div class="slider-row">
+        <span id="tSetPAMode">广播模式</span>
+        <div class="seg">
+          <button id="btnPALive">实时</button>
+          <button id="btnPARecord">回放</button>
+        </div>
+      </div>
+      <button class="btn-reset-defaults" id="btnResetDefaults">恢复默认设置</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toastBox"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var DEFAULT_CONFIG = {
+        lang: "zh",
+        reverb: 0.20,
+        low: 4,
+        mid: 2,
+        high: 0,
+        paMode: "record"
+      };
+
+      var config = Object.assign({}, DEFAULT_CONFIG);
+      try {
+        var saved = localStorage.getItem("police_siren_config_v1");
+        if (saved) {
+          var parsed = JSON.parse(saved);
+          Object.assign(config, parsed);
+        }
+      } catch (e) { }
+
+      function saveConfig() {
+        try {
+          localStorage.setItem("police_siren_config_v1", JSON.stringify(config));
+        } catch (e) { }
+      }
+
+      var currentLang = config.lang;
+      var paMode = config.paMode;
+
+      var i18n = {
+        zh: {
+          brandName: "手机警报器",
+          pageTitle: "手机警报器",
+          statusReady: "系统就绪",
+          sec1: "号角与广播",
+          btnHorn: "气笛号角",
+          subHorn: "点按触发",
+          btnMic: "车外广播",
+          subMicLive: "按住说话",
+          subMicRec: "按住录音",
+          subMicActive: "广播中...",
+          sec2: "战术警灯",
+          btnAutoLgt: "自动联动",
+          subAutoLgt: "随动",
+          btnM1: "模式 1",
+          subM1: "示宽",
+          btnM2: "模式 2",
+          subM2: "双爆",
+          btnM3: "模式 3",
+          subM3: "大循环",
+          btnStopLgt: "拦停检车",
+          subStopLgt: "前射灯",
+          setTitle: "系统设置与全局均衡",
+          setReverb: "全局混响 (0 - 100%)",
+          setLow: "全局低音 (180Hz)",
+          setMid: "全局中音 (1000Hz)",
+          setHigh: "全局高音 (4000Hz)",
+          sec3: "手动电笛",
+          btnManHigh: "高音电笛",
+          subManHigh: "长按爬升 / 松开滑落",
+          btnManLow: "低音电笛",
+          subManLow: "长按爬升 / 飞轮拖尾",
+          sec4: "巡航警报",
+          btnWail: "巡航 Wail",
+          subWail: "标准",
+          btnWailSlow: "慢速 Wail",
+          subWailSlow: "慢速",
+          btnWailFast: "快速 Wail",
+          subWailFast: "快速",
+          sec5: "急促警报",
+          btnYelp: "急促 Yelp",
+          subYelp: "急促",
+          btnPriority: "追击变频",
+          subPriority: "追击",
+          btnPhaser: "极速穿透",
+          subPhaser: "极速",
+          sec6: "特种与轮换",
+          btnWarble: "战术颤音",
+          subWarble: "高频颤音",
+          btnHilo: "救护 Hi-Lo",
+          subHilo: "救护双音",
+          btnAuto: "自动",
+          subAuto: "随机轮换",
+          sec7: "双音并发",
+          btnDualA: "并发 A",
+          subDualA: "巡航 + 急促",
+          btnDualB: "并发 B",
+          subDualB: "急促 + 颤音",
+          sec8: "系统控制",
+          btnSubPulse: "重低音脉冲",
+          subPulseArmed: "已就绪",
+          subPulseIdle: "点击开启",
+          subPulseActive: "纯正低音输出",
+          btnSet: "系统设置",
+          subSet: "调音设置",
+          btnLowPwr: "低功率",
+          btnSilent: "静音",
+          subSilent: "一键全停",
+          setPAMode: "广播模式",
+          paLive: "实时",
+          paRecord: "回放",
+          micRecording: "录音中...",
+          btnResetDefaults: "恢复默认设置",
+          discBody: "本软件仅供娱乐与技术学习，严禁在道路、商场、公园、居民区等公共场所播放，严禁用于冒充特种车辆等违法行为，违者后果自负。",
+          btnRefuse: "拒绝并退出",
+          btnAgree: "同意并进入"
+        },
+        en: {
+          brandName: "Mobile Siren",
+          pageTitle: "Mobile Siren",
+          statusReady: "SYSTEM READY",
+          sec1: "HORN & PA",
+          btnHorn: "AIR HORN",
+          subHorn: "Tap to Pulse",
+          btnMic: "PA MIC",
+          subMicLive: "Hold to Talk",
+          subMicRec: "Hold to Rec",
+          subMicActive: "Broadcasting...",
+          sec2: "LIGHTS",
+          btnAutoLgt: "AUTO",
+          subAutoLgt: "Adaptive",
+          btnM1: "MODE 1",
+          subM1: "Cruise",
+          btnM2: "MODE 2",
+          subM2: "Flash",
+          btnM3: "MODE 3",
+          subM3: "Pursuit",
+          btnStopLgt: "TAKEDOWN",
+          subStopLgt: "Scene Light",
+          setTitle: "MASTER SETTINGS & EQ",
+          setReverb: "Reverb (0 - 100%)",
+          setLow: "Low Punch (180Hz)",
+          setMid: "Mid Peak (1000Hz)",
+          setHigh: "High Shelf (4000Hz)",
+          sec3: "MANUAL",
+          btnManHigh: "HIGH SIREN",
+          subManHigh: "Rise / Coast",
+          btnManLow: "LOW SIREN",
+          subManLow: "Inertia Coast",
+          sec4: "CRUISE PATTERNS",
+          btnWail: "WAIL STD",
+          subWail: "Standard",
+          btnWailSlow: "WAIL SLOW",
+          subWailSlow: "Slow",
+          btnWailFast: "WAIL FAST",
+          subWailFast: "Fast",
+          sec5: "RAPID PATTERNS",
+          btnYelp: "YELP STD",
+          subYelp: "Rapid",
+          btnPriority: "PRIORITY",
+          subPriority: "Pursuit",
+          btnPhaser: "PHASER",
+          subPhaser: "Piercing",
+          sec6: "SPECIALTY",
+          btnWarble: "WARBLE",
+          subWarble: "Sweeper",
+          btnHilo: "HI-LO",
+          subHilo: "Medical",
+          btnAuto: "AUTO",
+          subAuto: "Auto Cycle",
+          sec7: "DUAL OUTPUT",
+          btnDualA: "DUAL A",
+          subDualA: "Wail + Yelp",
+          btnDualB: "DUAL B",
+          subDualB: "Yelp + Warble",
+          sec8: "CONTROL",
+          btnSubPulse: "SUB-PULSE",
+          subPulseArmed: "Armed",
+          subPulseIdle: "Tap to Arm",
+          subPulseActive: "Sub Active",
+          btnSet: "SETTINGS",
+          subSet: "Audio EQ",
+          btnLowPwr: "LOW PWR",
+          btnSilent: "SILENT",
+          subSilent: "All Mute",
+          setPAMode: "PA Mode",
+          paLive: "Live",
+          paRecord: "Rec/Play",
+          micRecording: "Recording...",
+          btnResetDefaults: "Reset Defaults",
+          discBody: "This software is for entertainment and technical learning only. It is strictly prohibited to play in public places such as roads, malls, parks, and residential areas. Strictly prohibited from being used to impersonate emergency vehicles. Violators shall bear all consequences.",
+          btnRefuse: "Decline & Exit",
+          btnAgree: "Agree & Enter"
+        }
+      };
+
+      function applyLanguage(lang) {
+        currentLang = lang;
+        config.lang = lang;
+        saveConfig();
+
+        var d = i18n[lang];
+        document.getElementById("pageTitle").innerText = d.pageTitle;
+        document.getElementById("tBrandName").innerText = d.brandName;
+        document.getElementById("txtStatus").innerText = d.statusReady;
+        document.getElementById("tSec1").innerText = d.sec1;
+        document.getElementById("tBtnHorn").innerText = d.btnHorn;
+        document.getElementById("tSubHorn").innerText = d.subHorn;
+        document.getElementById("tBtnMic").innerText = d.btnMic;
+        if (!isMicActive) {
+          document.getElementById("micSubTxt").innerText = (paMode === "live") ? d.subMicLive : d.subMicRec;
+        }
+        document.getElementById("tSec2").innerText = d.sec2;
+        document.getElementById("tBtnAutoLgt").innerText = d.btnAutoLgt;
+        document.getElementById("tSubAutoLgt").innerText = d.subAutoLgt;
+        document.getElementById("tBtnM1").innerText = d.btnM1;
+        document.getElementById("tSubM1").innerText = d.subM1;
+        document.getElementById("tBtnM2").innerText = d.btnM2;
+        document.getElementById("tSubM2").innerText = d.subM2;
+        document.getElementById("tBtnM3").innerText = d.btnM3;
+        document.getElementById("tSubM3").innerText = d.subM3;
+        document.getElementById("tBtnStopLgt").innerText = d.btnStopLgt;
+        document.getElementById("tSubStopLgt").innerText = d.subStopLgt;
+        document.getElementById("tSetTitle").innerText = d.setTitle;
+        document.getElementById("tSetReverb").innerText = d.setReverb;
+        document.getElementById("tSetLow").innerText = d.setLow;
+        document.getElementById("tSetMid").innerText = d.setMid;
+        document.getElementById("tSetHigh").innerText = d.setHigh;
+        document.getElementById("tSec3").innerText = d.sec3;
+        document.getElementById("tBtnManHigh").innerText = d.btnManHigh;
+        document.getElementById("tSubManHigh").innerText = d.subManHigh;
+        document.getElementById("tBtnManLow").innerText = d.btnManLow;
+        document.getElementById("tSubManLow").innerText = d.subManLow;
+        document.getElementById("tSec4").innerText = d.sec4;
+        document.getElementById("tBtnWail").innerText = d.btnWail;
+        document.getElementById("tSubWail").innerText = d.subWail;
+        document.getElementById("tBtnWailSlow").innerText = d.btnWailSlow;
+        document.getElementById("tSubWailSlow").innerText = d.subWailSlow;
+        document.getElementById("tBtnWailFast").innerText = d.btnWailFast;
+        document.getElementById("tSubWailFast").innerText = d.subWailFast;
+        document.getElementById("tSec5").innerText = d.sec5;
+        document.getElementById("tBtnYelp").innerText = d.btnYelp;
+        document.getElementById("tSubYelp").innerText = d.subYelp;
+        document.getElementById("tBtnPriority").innerText = d.btnPriority;
+        document.getElementById("tSubPriority").innerText = d.subPriority;
+        document.getElementById("tBtnPhaser").innerText = d.btnPhaser;
+        document.getElementById("tSubPhaser").innerText = d.subPhaser;
+        document.getElementById("tSec6").innerText = d.sec6;
+        document.getElementById("tBtnWarble").innerText = d.btnWarble;
+        document.getElementById("tSubWarble").innerText = d.subWarble;
+        document.getElementById("tBtnHilo").innerText = d.btnHilo;
+        document.getElementById("tSubHilo").innerText = d.subHilo;
+        document.getElementById("tBtnAuto").innerText = d.btnAuto;
+        if (!isAutoCycle) document.getElementById("autoSubText").innerText = d.subAuto;
+        document.getElementById("tSec7").innerText = d.sec7;
+        document.getElementById("tBtnDualA").innerText = d.btnDualA;
+        document.getElementById("tSubDualA").innerText = d.subDualA;
+        document.getElementById("tBtnDualB").innerText = d.btnDualB;
+        document.getElementById("tSubDualB").innerText = d.subDualB;
+        document.getElementById("tSec8").innerText = d.sec8;
+        document.getElementById("tBtnSubPulse").innerText = d.btnSubPulse;
+        document.getElementById("tBtnSet").innerText = d.btnSet;
+        document.getElementById("tSubSet").innerText = d.subSet;
+        document.getElementById("tBtnLowPwr").innerText = d.btnLowPwr;
+        document.getElementById("tBtnSilent").innerText = d.btnSilent;
+        document.getElementById("tSubSilent").innerText = d.subSilent;
+
+        document.getElementById("tSetPAMode").innerText = d.setPAMode;
+        document.getElementById("btnPALive").innerText = d.paLive;
+        document.getElementById("btnPARecord").innerText = d.paRecord;
+        document.getElementById("btnResetDefaults").innerText = d.btnResetDefaults;
+
+
+        document.getElementById("tDiscBody").innerText = d.discBody;
+        document.getElementById("btnDiscRefuse").innerText = d.btnRefuse;
+        document.getElementById("btnDiscAgree").innerText = d.btnAgree;
+
+        document.getElementById("btnLangZh").classList.toggle("active", lang === "zh");
+        document.getElementById("btnLangEn").classList.toggle("active", lang === "en");
+        updateUI();
+      }
+
+      var ctx = null;
+      var masterPreEQ, masterLimiter, masterOutput;
+      var sirenBus1, sirenBus2, momentBus, manualBusHigh, manualBusLow, rumblerBus, rumblerMasterGate, micBus;
+      var pannerL = null, pannerR = null;
+      var eqLow, eqMid, eqHigh, convolverNode, reverbHighPass, dryGain, wetGain;
+
+      var micStream = null;
+      var micSourceNode = null;
+      var isMicActive = false;
+      var paRecorder = null;
+      var paRecordChunks = [];
+
+      var activeVoices = [];
+      var currentMode = null;
+      var hornVoiceNodes = [];
+      var isHowlerArmed = false;
+      var rumblerVoices = [];
+      var hornRumblerVoice = null;
+      var isLowPower = false;
+      var isAutoCycle = false;
+      var autoTimer = null;
+      var lastAutoMode = "";
+
+      var activeLightMode = "auto";
+      var isStopLightActive = false;
+
+      var activeToneStateList = [];
+      var sirenWave = null;
+
+      var HORN_SAMPLE_B64 = "df57E7srj0RvWZ9nDHBldMF11XSncT1sUGVlXRFU5UibPF8wMSR5F+AKF/9e82bnZNvGzyLGwr5/uEezUK82rX+tL6+lsYq0xrfgu4W/tcF9w73EN8UlxbzEQsboyv7QsNci32vnUPDt+PsA1geZDFUQ3BMTF+saWh81I6omjCpML900CTrZPWVAN0HzP7k87zb2Lk0mjx28FfMPBwyuCUYIHAfnBsIHGQjwBssEYwKe/+D8HPv9+Un5Zvna+cL66/ui+5L5bvbk8jHwnu0K6g3nEeX04vrgPN+53aLceNsE22HcId/b4u3mtOpe7t/xtPV2+q7/JgXTCvsQsRdnHZghuyQ8JkomyySiIWcevBpQFQIPmQjAAk39IPfW8NXq5ORH32XZOdWv1WjZOt9l5x3xZ/wVCDESAht1Iq8o5C6MNP840jvQOy45ojRtLmYnaB+1FSQL3AC49lbsQuI32cvR88w1yxrMCc+Z02/ZJuCC51DvvfYa/dACiwjzDfcRfhThFTcVsRHcC38Ervtq8Xjnud+42RvVi9L80SrTsdXA2ebfCOeO7j73fQCTCT0StxkPIMwlDSuYL9Uy0zTNNdM1UTVRNLwymC+2KQQjPx2EF5gRUQu5BYADBAS8BTMJeA1oEUoUhRSZEuIPOAzlB0wDRv7b+KXyjetK5CfdXtZU0LDK38R3vxG8Y7uLvO++9MJoyAvPI9ey337n5e5O9l39lgO7CEMN5BA4EusQdw32B6AAwvcT7iXlk95D2/DaN90l4rro4e/g9wABVAszFlcgYSoGNZY/RkrSVNVd7GS2aeFruWteaWVlnF/gVldLuz3ZLnIfaQ8T/7Puhd7izwDDtrcar1ipaabFpoapxa1htIa+f8so2SvmxvGl+xgEGgu9EPEUOxekFwQW4BKLD18L9ARK/DLyMOgR30fWEs2sw367C7UfsPas/6qEqg2t37IOvEbITtba5Vn20AY6F/Ym7TRvQANJA08kU4VVxlX4U2BRrk7dStpEwTz7M4ArtiJCGmkU1hHcEf8ThhcsHOkhsSc+LWsz2DmVP7pDNUVgRPdBSz2YNQgr/h0aDlj71uez1d3FL7n3r1eqAajEp9+omKngp4ikLKHSnqOeIKBqovKlVKvJsxHAvc7K3cbr3veeAR8IsQpkCXEF1QGaALQBDQXeCUMPtxUzHWYldy7KNps80D/FQCBACz2mNRsrBiCDFZQLVAHS9gTt7uO622bU/83VyXDHosXXxXPJ5dBU3Ljq/Ps5Eb0pikKDVxZm6W6Pc/p09nOycApr0GOvW/FRQka5OYQtliEbFa0IX/1d8iDn/dsc0cXHkMB6ulC1d7GWr8Wv/bD0smu1WLhVvOq/FMLswzbFosVYxcHEWMblysHQftf33jTnO/D0+BMB+gfBDI4QFRRVF1sbzx+HI+omripSLwY1YTo7PsxAxkHBQL89GjglMEcnRR5WFlsQGAyFCd0HfwYzBt8GIAfwBZQDBgFO/rL7A/oK+ar41fhQ+YT6wfuY+7X5cfYQ83Hwle0g6iDnw+Sf4rzgHN/L3brcltsd22/cad9945/nOOsP7+Dyi/Ys+14AewV1/g==";
+      var _hornSampleBuffer = null;
+
+      function decodeHornSample() {
+        if (_hornSampleBuffer) return _hornSampleBuffer;
+        var bin = atob(HORN_SAMPLE_B64);
+        var bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        var int16 = new Int16Array(bytes.buffer);
+        var buf = ctx.createBuffer(1, int16.length, 44100);
+        var ch = buf.getChannelData(0);
+        for (var i = 0; i < int16.length; i++) ch[i] = int16[i] / 32768;
+        _hornSampleBuffer = buf;
+        return buf;
+      }
+
+      function initWaveTables() {
+        var N = 64;
+        var rS = new Float32Array(N), iS = new Float32Array(N);
+        iS[1] = 1.00; iS[2] = 0.08; iS[3] = 0.06; iS[4] = 0.02; iS[5] = 0.03;
+        sirenWave = ctx.createPeriodicWave(rS, iS, { disableNormalization: false });
+      }
+
+      function createImpulseResponse(duration, decay) {
+        var rate = ctx.sampleRate;
+        var length = rate * duration;
+        var impulse = ctx.createBuffer(2, length, rate);
+        var left = impulse.getChannelData(0), right = impulse.getChannelData(1);
+        for (var i = 0; i < length; i++) {
+          var d = Math.pow(1 - i / length, decay);
+          left[i] = (Math.random() * 2 - 1) * d;
+          right[i] = (Math.random() * 2 - 1) * d;
+        }
+        return impulse;
+      }
+
+      function buildHornSpeakerAcoustics(inputNode, outputNode) {
+        var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 340; hp.Q.value = 0.7;
+        var body = ctx.createBiquadFilter(); body.type = "peaking"; body.frequency.value = 560; body.Q.value = 1.1; body.gain.value = 4.0;
+        var throat = ctx.createBiquadFilter(); throat.type = "peaking"; throat.frequency.value = 1350; throat.Q.value = 1.1; throat.gain.value = 4.2;
+        var rollOff = ctx.createBiquadFilter(); rollOff.type = "lowpass"; rollOff.frequency.value = 4200; rollOff.Q.value = 0.75;
+
+        var shaper = ctx.createWaveShaper();
+        var n = 1024, curve = new Float32Array(n);
+        for (var i = 0; i < n; i++) {
+          var x = (i * 2) / n - 1;
+          curve[i] = Math.tanh(x * 1.12);
+        }
+        shaper.curve = curve;
+
+        inputNode.connect(hp);
+        hp.connect(body); body.connect(throat); throat.connect(rollOff);
+        rollOff.connect(shaper); shaper.connect(outputNode);
+      }
+
+      function buildHeavyMechanicalLowAcoustics(inputNode, outputNode) {
+        var subPass = ctx.createBiquadFilter();
+        subPass.type = "peaking";
+        subPass.frequency.value = 120;
+        subPass.Q.value = 1.4;
+        subPass.gain.value = 5.5;
+
+        var rotorChest = ctx.createBiquadFilter();
+        rotorChest.type = "peaking";
+        rotorChest.frequency.value = 240;
+        rotorChest.Q.value = 1.8;
+        rotorChest.gain.value = 4.5;
+
+        var lp = ctx.createBiquadFilter();
+        lp.type = "lowpass";
+        lp.frequency.value = 2800;
+        lp.Q.value = 0.85;
+
+        var mechShaper = ctx.createWaveShaper();
+        var n = 1024, mCurve = new Float32Array(n);
+        for (var i = 0; i < n; i++) {
+          var x = (i * 2) / n - 1;
+          mCurve[i] = Math.tanh(x * 1.35) + 0.08 * (x * x);
+        }
+        mechShaper.curve = mCurve;
+
+        inputNode.connect(subPass);
+        subPass.connect(rotorChest);
+        rotorChest.connect(lp);
+        lp.connect(mechShaper);
+        mechShaper.connect(outputNode);
+      }
+
+      function ensureCtx() {
+        if (!ctx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          ctx = new AC();
+
+          masterOutput = ctx.createGain();
+          masterOutput.gain.value = 0.75;
+
+          masterPreEQ = ctx.createGain();
+          masterPreEQ.gain.value = 0.70;
+
+          eqLow = ctx.createBiquadFilter();
+          eqLow.type = "lowshelf";
+          eqLow.frequency.value = 180;
+          eqLow.gain.value = config.low;
+
+          eqMid = ctx.createBiquadFilter();
+          eqMid.type = "peaking";
+          eqMid.frequency.value = 1000;
+          eqMid.Q.value = 1.0;
+          eqMid.gain.value = config.mid;
+
+          eqHigh = ctx.createBiquadFilter();
+          eqHigh.type = "highshelf";
+          eqHigh.frequency.value = 4000;
+          eqHigh.gain.value = config.high;
+
+          reverbHighPass = ctx.createBiquadFilter();
+          reverbHighPass.type = "highpass";
+          reverbHighPass.frequency.value = 160;
+          reverbHighPass.Q.value = 0.7;
+
+          convolverNode = ctx.createConvolver();
+          convolverNode.buffer = createImpulseResponse(1.4, 2.2);
+
+          dryGain = ctx.createGain(); dryGain.gain.value = Math.max(0.05, 1.0 - config.reverb * 0.7);
+          wetGain = ctx.createGain(); wetGain.gain.value = config.reverb;
+
+          masterLimiter = ctx.createDynamicsCompressor();
+          masterLimiter.threshold.value = -1.5;
+          masterLimiter.knee.value = 3.0;
+          masterLimiter.ratio.value = 10.0;
+          masterLimiter.attack.value = 0.003;
+          masterLimiter.release.value = 0.05;
+
+          sirenBus1 = ctx.createGain(); sirenBus1.gain.value = 1.0;
+          sirenBus2 = ctx.createGain(); sirenBus2.gain.value = 1.0;
+          momentBus = ctx.createGain(); momentBus.gain.value = 1.0;
+
+          manualBusHigh = ctx.createGain(); manualBusHigh.gain.value = 1.0;
+          manualBusLow = ctx.createGain(); manualBusLow.gain.value = 1.0;
+
+          rumblerBus = ctx.createGain(); rumblerBus.gain.value = 1.0;
+          rumblerMasterGate = ctx.createGain(); rumblerMasterGate.gain.value = 0.95;
+
+          micBus = ctx.createGain(); micBus.gain.value = 5.50;
+
+          initWaveTables();
+
+          if (ctx.createStereoPanner) {
+            pannerL = ctx.createStereoPanner(); pannerL.pan.value = -0.75;
+            pannerR = ctx.createStereoPanner(); pannerR.pan.value = 0.75;
+            buildHornSpeakerAcoustics(sirenBus1, pannerL); pannerL.connect(masterPreEQ);
+            buildHornSpeakerAcoustics(sirenBus2, pannerR); pannerR.connect(masterPreEQ);
+          } else {
+            buildHornSpeakerAcoustics(sirenBus1, masterPreEQ);
+            buildHornSpeakerAcoustics(sirenBus2, masterPreEQ);
+          }
+
+          var hornHP = ctx.createBiquadFilter(); hornHP.type = "highpass"; hornHP.frequency.value = 180; hornHP.Q.value = 0.7;
+          var hornBody = ctx.createBiquadFilter(); hornBody.type = "peaking"; hornBody.frequency.value = 460; hornBody.Q.value = 0.9; hornBody.gain.value = 3.0;
+          var hornLP = ctx.createBiquadFilter(); hornLP.type = "lowpass"; hornLP.frequency.value = 5400; hornLP.Q.value = 0.8;
+          momentBus.connect(hornHP); hornHP.connect(hornBody); hornBody.connect(hornLP); hornLP.connect(masterPreEQ);
+
+          buildHornSpeakerAcoustics(manualBusHigh, masterPreEQ);
+          buildHeavyMechanicalLowAcoustics(manualBusLow, masterPreEQ);
+
+          var rHP = ctx.createBiquadFilter();
+          rHP.type = "highpass";
+          rHP.frequency.value = 48;
+          rHP.Q.value = 0.707;
+
+          var rLP = ctx.createBiquadFilter();
+          rLP.type = "lowpass";
+          rLP.frequency.value = 180;
+          rLP.Q.value = 0.8;
+
+          rumblerBus.connect(rumblerMasterGate);
+          rumblerMasterGate.connect(rHP);
+          rHP.connect(rLP);
+          rLP.connect(masterPreEQ);
+
+          var micHP = ctx.createBiquadFilter(); micHP.type = "highpass"; micHP.frequency.value = 350; micHP.Q.value = 0.9;
+          var micPunch = ctx.createBiquadFilter(); micPunch.type = "peaking"; micPunch.frequency.value = 1800; micPunch.Q.value = 1.3; micPunch.gain.value = 9.0;
+          var micLP = ctx.createBiquadFilter(); micLP.type = "lowpass"; micLP.frequency.value = 3200;
+
+          var micShaper = ctx.createWaveShaper();
+          var mn = 2048, mnCurve = new Float32Array(mn);
+          for (var mi = 0; mi < mn; mi++) {
+            var mx = (mi * 2) / mn - 1;
+            var y = mx * 3.5;
+            mnCurve[mi] = Math.max(-1, Math.min(1, y));
+          }
+          micShaper.curve = mnCurve;
+          micShaper.oversample = "2x";
+
+          micBus.connect(micHP);
+          micHP.connect(micPunch);
+          micPunch.connect(micLP);
+          micLP.connect(micShaper);
+          micShaper.connect(masterPreEQ);
+
+          masterPreEQ.connect(eqLow);
+          eqLow.connect(eqMid);
+          eqMid.connect(eqHigh);
+
+          eqHigh.connect(dryGain);
+          dryGain.connect(masterLimiter);
+
+          eqHigh.connect(reverbHighPass);
+          reverbHighPass.connect(convolverNode);
+          convolverNode.connect(wetGain);
+          wetGain.connect(masterLimiter);
+
+          masterLimiter.connect(masterOutput);
+          masterOutput.connect(ctx.destination);
+        }
+        if (ctx.state === "suspended") {
+          ctx.resume().catch(function () { });
+        }
+      }
+
+      function startOscillatorVoice(bus, wave, gainVal, startTime) {
+        ensureCtx();
+        var t = (typeof startTime === "number") ? startTime : ctx.currentTime;
+        var osc = ctx.createOscillator();
+        if (wave === "sine") {
+          osc.type = "sine";
+        } else {
+          osc.setPeriodicWave(wave);
+        }
+
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(gainVal || 0.85, t + 0.020);
+
+        osc.connect(gain);
+        gain.connect(bus);
+        osc.start(t);
+
+        return {
+          osc: osc,
+          gain: gain,
+          stop: function (fadeTime) {
+            fadeTime = fadeTime || 0.030;
+            var now = ctx.currentTime;
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(Math.max(0.0001, gain.gain.value), now);
+            gain.gain.linearRampToValueAtTime(0.0001, now + fadeTime);
+            setTimeout(function () {
+              try { osc.stop(); osc.disconnect(); gain.disconnect(); } catch (e) { }
+            }, (fadeTime + 0.05) * 1000);
+          }
+        };
+      }
+
+      function getSirenToneConfig(mode) {
+        if (mode === "wail" || mode === "wail_slow" || mode === "wail_fast") {
+          var period = mode === "wail_slow" ? 8.0 : (mode === "wail_fast" ? 3.0 : 5.4);
+          return { type: "wail", fMin: 650, fMax: 1650, period: period };
+        } else if (mode === "yelp" || mode === "priority" || mode === "phaser") {
+          var rate = mode === "priority" ? 5.0 : (mode === "phaser" ? 8.0 : 3.85);
+          return { type: "yelp", fMin: 650, fMax: 1650, period: 1.0 / rate };
+        } else if (mode === "warble") {
+          return { type: "warble", fMin: 680, fMax: 1680, period: 1.0 / 12.5 };
+        } else if (mode === "hilo") {
+          return { type: "hilo", fHi: 603, fLo: 334, period: 1.0 };
+        }
+        return { type: "wail", fMin: 650, fMax: 1650, period: 5.4 };
+      }
+
+      function applyTonePattern(osc, config, startTime) {
+        var t = (typeof startTime === "number") ? startTime : ctx.currentTime;
+        osc.frequency.cancelScheduledValues(t);
+
+        if (config.type === "wail") {
+          var fMin = config.fMin, fMax = config.fMax, p = config.period;
+          var upT = p * 0.38, holdT = p * 0.165, downFast = p * 0.19;
+          var midF = fMin + (fMax - fMin) * 0.35;
+
+          osc.frequency.setValueAtTime(fMin, t);
+          for (var i = 0; i < 60; i++) {
+            var base = t + i * p;
+            osc.frequency.exponentialRampToValueAtTime(fMax, base + upT);
+            osc.frequency.setValueAtTime(fMax, base + upT + holdT);
+            osc.frequency.linearRampToValueAtTime(midF, base + upT + holdT + downFast);
+            osc.frequency.exponentialRampToValueAtTime(fMin, base + p);
+          }
+        } else if (config.type === "yelp") {
+          var p2 = config.period, fMin2 = config.fMin, fMax2 = config.fMax;
+          var up2 = p2 * 0.58;
+
+          osc.frequency.setValueAtTime(fMin2, t);
+          for (var j = 0; j < 600; j++) {
+            var bj = t + j * p2;
+            osc.frequency.linearRampToValueAtTime(fMax2, bj + up2);
+            osc.frequency.linearRampToValueAtTime(fMin2, bj + p2);
+          }
+        } else if (config.type === "warble") {
+          var pw = config.period, half = pw * 0.5;
+          osc.frequency.setValueAtTime(config.fMin, t);
+          for (var w = 0; w < 450; w++) {
+            var bw = t + w * pw;
+            osc.frequency.linearRampToValueAtTime(config.fMax, bw + half);
+            osc.frequency.linearRampToValueAtTime(config.fMin, bw + pw);
+          }
+        } else if (config.type === "hilo") {
+          osc.frequency.setValueAtTime(config.fHi, t);
+          for (var k = 0; k < 120; k++) {
+            osc.frequency.setValueAtTime(config.fHi, t + k);
+            osc.frequency.setValueAtTime(config.fLo, t + k + 0.5);
+          }
+        }
+      }
+
+      function applyRumblerCleanPattern(osc, config, startTime, phaseOffset) {
+        var t = (typeof startTime === "number") ? startTime : ctx.currentTime;
+        var offset = phaseOffset || 0;
+        osc.frequency.cancelScheduledValues(t);
+
+        var fMin = 54, fMax = 92, period = config.period, t0 = t - offset;
+
+        if (config.type === "wail") {
+          var upT = period * 0.38, holdT = period * 0.165, downFast = period * 0.19;
+          var midF = fMin + (fMax - fMin) * 0.35;
+
+          osc.frequency.setValueAtTime(fMin, t);
+          for (var i = 0; i < 60; i++) {
+            var base = t0 + i * period;
+            if (base + period < t) continue;
+            var targetUp = base + upT;
+            if (targetUp > t + 0.08) osc.frequency.exponentialRampToValueAtTime(fMax, targetUp);
+            var targetHold = base + upT + holdT;
+            if (targetHold > t + 0.08) osc.frequency.setValueAtTime(fMax, targetHold);
+            var targetMid = base + upT + holdT + downFast;
+            if (targetMid > t + 0.08) osc.frequency.linearRampToValueAtTime(midF, targetMid);
+            var targetEnd = base + period;
+            if (targetEnd > t + 0.08) osc.frequency.exponentialRampToValueAtTime(fMin, targetEnd);
+          }
+        } else if (config.type === "yelp" || config.type === "warble") {
+          var p2 = config.period, up = p2 * 0.58;
+          var steps = (config.type === "warble") ? 450 : 600;
+          osc.frequency.setValueAtTime(fMin, t);
+          for (var j = 0; j < steps; j++) {
+            var bj = t0 + j * p2;
+            if (bj + p2 < t) continue;
+            osc.frequency.linearRampToValueAtTime(fMax, bj + up);
+            osc.frequency.linearRampToValueAtTime(fMin, bj + p2);
+          }
+        } else if (config.type === "hilo") {
+          for (var k = 0; k < 120; k++) {
+            var bk = t0 + k;
+            if (bk + 1 < t) continue;
+            osc.frequency.setValueAtTime(fMax, bk);
+            osc.frequency.setValueAtTime(fMin, bk + 0.5);
+          }
+        }
+      }
+
+      function startRumblerCleanUnit(cfg, t0, phaseOffset, gainVal) {
+        gainVal = (typeof gainVal === "number") ? gainVal : 0.95;
+        var osc = ctx.createOscillator();
+        osc.type = "sine";
+        applyRumblerCleanPattern(osc, cfg, t0, phaseOffset);
+
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.linearRampToValueAtTime(gainVal, t0 + 0.035);
+
+        osc.connect(gain);
+        gain.connect(rumblerBus);
+        osc.start(t0);
+        rumblerVoices.push({ osc: osc, gain: gain });
+      }
+
+      function syncRumblerToActiveState(startTime) {
+        ensureCtx();
+        var now = ctx.currentTime;
+
+        if (hornVoiceNodes.length > 0) {
+          stopRumblerNow();
+          updateUI();
+          return;
+        }
+
+        rumblerMasterGate.gain.cancelScheduledValues(now);
+        rumblerMasterGate.gain.setValueAtTime(Math.max(0.0001, rumblerMasterGate.gain.value), now);
+        rumblerMasterGate.gain.linearRampToValueAtTime(0.0001, now + 0.015);
+
+        stopRumblerNow();
+        if (!isHowlerArmed || activeToneStateList.length === 0) {
+          updateUI();
+          return;
+        }
+
+        var t0 = now + 0.020;
+        var isDual = activeToneStateList.length > 1;
+        var perGain = isDual ? 0.55 : 0.95;
+
+        activeToneStateList.forEach(function (cfg) {
+          var phaseOffset = (cfg._t0 && now > cfg._t0) ? ((now - cfg._t0) % cfg.period) : 0;
+          startRumblerCleanUnit(cfg, t0, phaseOffset, perGain);
+        });
+
+        rumblerMasterGate.gain.setValueAtTime(0.0001, t0);
+        rumblerMasterGate.gain.linearRampToValueAtTime(0.95, t0 + 0.030);
+        updateUI();
+      }
+
+      function stopRumblerNow() {
+        var now = ctx.currentTime;
+        if (rumblerVoices.length > 0) {
+          rumblerVoices.forEach(function (v) {
+            try {
+              if (v.gain) {
+                v.gain.gain.cancelScheduledValues(now);
+                v.gain.gain.setValueAtTime(Math.max(0.0001, v.gain.gain.value), now);
+                v.gain.gain.linearRampToValueAtTime(0.0001, now + 0.015);
+              }
+              setTimeout(function () {
+                try { if (v.osc) { v.osc.stop(); v.osc.disconnect(); } } catch (e) { }
+                try { if (v.gain) { v.gain.disconnect(); } } catch (e) { }
+              }, 30);
+            } catch (e) { }
+          });
+          rumblerVoices = [];
+        }
+      }
+
+      function toggleHowler() {
+        ensureCtx();
+        isHowlerArmed = !isHowlerArmed;
+        if (isHowlerArmed) {
+          if (hornVoiceNodes.length > 0) startHornRumbler();
+          else syncRumblerToActiveState();
+        } else {
+          stopRumblerNow();
+          stopHornRumbler();
+        }
+        updateUI();
+      }
+
+      class DedicatedManualEngine {
+        constructor(tag, targetF, lowestF, riseTC, coastTC, busGetter, baseGain, coastDur) {
+          this.tag = tag;
+          this.targetF = targetF;
+          this.lowestF = lowestF;
+          this.riseTC = riseTC;
+          this.coastTC = coastTC;
+          this.busGetter = busGetter;
+          this.baseGain = baseGain;
+          this.coastDur = coastDur;
+          this.voice = null;
+          this.state = "idle";
+          this.timer = null;
+        }
+
+        press() {
+          ensureCtx();
+          var now = ctx.currentTime;
+          if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+
+          var targetBus = this.busGetter();
+
+          if (this.state === "idle" || !this.voice) {
+            this.voice = startOscillatorVoice(targetBus, sirenWave, this.baseGain, now);
+            this.voice.osc.frequency.setValueAtTime(this.lowestF, now);
+            this.state = "rising";
+            this.voice.osc.frequency.setTargetAtTime(this.targetF, now, this.riseTC);
+          } else {
+            this.voice.osc.frequency.cancelScheduledValues(now);
+            this.voice.gain.gain.cancelScheduledValues(now);
+            this.voice.gain.gain.setTargetAtTime(this.baseGain, now, 0.02);
+            this.voice.osc.frequency.setTargetAtTime(this.targetF, now, this.riseTC);
+            this.state = "rising";
+          }
+          updateUI();
+        }
+
+        release() {
+          if (this.state === "idle" || !this.voice) return;
+          var now = ctx.currentTime;
+          this.state = "coasting";
+
+          this.voice.osc.frequency.cancelScheduledValues(now);
+          this.voice.gain.gain.cancelScheduledValues(now);
+          this.voice.osc.frequency.setTargetAtTime(this.lowestF, now, this.coastTC);
+
+          this.voice.gain.gain.setValueAtTime(this.baseGain, now);
+          this.voice.gain.gain.setValueAtTime(this.baseGain * 0.9, now + this.coastDur * 0.40);
+          this.voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + this.coastDur);
+
+          var self = this;
+          this.timer = setTimeout(function () {
+            self.stop();
+            updateUI();
+          }, this.coastDur * 1000 + 50);
+        }
+
+        stop() {
+          if (this.voice) { this.voice.stop(0.04); this.voice = null; }
+          this.state = "idle";
+        }
+      }
+
+      var manualHighCtrl = new DedicatedManualEngine("high", 1650, 420, 0.60, 1.10, function () { return manualBusHigh; }, 0.95, 4.0);
+      var manualLowCtrl = new DedicatedManualEngine("low", 1520, 180, 0.90, 1.50, function () { return manualBusLow; }, 0.95, 5.2);
+
+      function cleanupHornVoices() {
+        if (hornVoiceNodes.length > 0) {
+          var now = ctx.currentTime;
+          hornVoiceNodes.forEach(function (v) {
+            if (v.gain) {
+              try {
+                v.gain.gain.cancelScheduledValues(now);
+                v.gain.gain.setValueAtTime(Math.max(0.0001, v.gain.gain.value), now);
+                v.gain.gain.linearRampToValueAtTime(0.0001, now + 0.008);
+              } catch (e) { }
+            }
+            setTimeout(function () {
+              try {
+                if (v.src) { v.src.stop(); v.src.disconnect(); }
+                if (v.gain) { v.gain.disconnect(); }
+              } catch (e) { }
+            }, 20);
+          });
+          hornVoiceNodes = [];
+        }
+      }
+
+      function startHornRumbler() {
+        stopHornRumbler();
+        if (!isHowlerArmed) return;
+        ensureCtx();
+        var t = ctx.currentTime;
+
+        rumblerMasterGate.gain.cancelScheduledValues(t);
+        rumblerMasterGate.gain.setValueAtTime(0.95, t);
+
+        var osc = ctx.createOscillator();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(86, t);
+        osc.frequency.exponentialRampToValueAtTime(58, t + 0.040);
+
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(1.0, t + 0.012);
+
+        osc.connect(gain);
+        gain.connect(rumblerBus);
+        osc.start(t);
+
+        hornRumblerVoice = { osc: osc, gain: gain };
+      }
+
+      function stopHornRumbler() {
+        if (hornRumblerVoice) {
+          var now = ctx.currentTime;
+          var hv = hornRumblerVoice;
+          hornRumblerVoice = null;
+          try {
+            hv.gain.gain.cancelScheduledValues(now);
+            hv.gain.gain.setValueAtTime(Math.max(0.0001, hv.gain.gain.value), now);
+            hv.gain.gain.linearRampToValueAtTime(0.0001, now + 0.015);
+            setTimeout(function () {
+              try { hv.osc.stop(); hv.osc.disconnect(); } catch (e) { }
+              try { hv.gain.disconnect(); } catch (e) { }
+            }, 30);
+          } catch (e) { }
+        }
+      }
+
+      function hornPress() {
+        ensureCtx();
+        var t = ctx.currentTime;
+        sirenBus1.gain.setValueAtTime(0.001, t);
+        sirenBus2.gain.setValueAtTime(0.001, t);
+        stopRumblerNow();
+        cleanupHornVoices();
+
+        var src = ctx.createBufferSource();
+        src.buffer = decodeHornSample();
+        src.loop = true;
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.95, t);
+        src.connect(gain);
+        gain.connect(momentBus);
+        src.start(t);
+
+        hornVoiceNodes = [{ src: src, gain: gain }];
+
+        if (isHowlerArmed) { startHornRumbler(); }
+        updateUI();
+      }
+
+      function resumeMainSirenFromScratch() {
+        cleanupHornVoices();
+        stopHornRumbler();
+
+        activeVoices.forEach(function (v) { try { v.stop(0.02); } catch (e) { } });
+        activeVoices = [];
+
+        var t = ctx.currentTime + 0.025;
+        if (currentMode) {
+          if (currentMode.indexOf(",") !== -1) {
+            var modes = currentMode.split(",");
+            var cfg1 = getSirenToneConfig(modes[0]); cfg1._t0 = t;
+            var cfg2 = getSirenToneConfig(modes[1]); cfg2._t0 = t;
+            var targetVol = isLowPower ? 0.25 : 1.0;
+            sirenBus1.gain.setValueAtTime(targetVol, t);
+            sirenBus2.gain.setValueAtTime(targetVol, t);
+
+            var v1 = startOscillatorVoice(sirenBus1, sirenWave, 0.72, t);
+            applyTonePattern(v1.osc, cfg1, t);
+            activeVoices.push(v1);
+
+            var v2 = startOscillatorVoice(sirenBus2, sirenWave, 0.72, t);
+            applyTonePattern(v2.osc, cfg2, t);
+            activeVoices.push(v2);
+
+            activeToneStateList = [cfg1, cfg2];
+            stopRumblerNow();
+          } else {
+            var cfg = getSirenToneConfig(currentMode); cfg._t0 = t;
+            sirenBus1.gain.setValueAtTime(0.001, t);
+            sirenBus1.gain.linearRampToValueAtTime(isLowPower ? 0.25 : 1.0, t + 0.015);
+
+            var v = startOscillatorVoice(sirenBus1, sirenWave, 0.88, t);
+            applyTonePattern(v.osc, cfg, t);
+            activeVoices.push(v);
+
+            activeToneStateList = [cfg];
+            if (isHowlerArmed) syncRumblerToActiveState(t);
+          }
+        } else {
+          activeToneStateList = [];
+          stopRumblerNow();
+        }
+        updateUI();
+      }
+
+      function restoreCurrentModeState() {
+        if (!currentMode) return;
+        var now = ctx.currentTime;
+        if (currentMode.indexOf(",") !== -1) {
+          var modes = currentMode.split(",");
+          var c1 = getSirenToneConfig(modes[0]); c1._t0 = now;
+          var c2 = getSirenToneConfig(modes[1]); c2._t0 = now;
+          activeToneStateList = [c1, c2];
+        } else {
+          var c = getSirenToneConfig(currentMode); c._t0 = now;
+          activeToneStateList = [c];
+        }
+      }
+
+      function startMicPA() {
+        ensureCtx();
+        if (isMicActive) return;
+
+        var t = ctx.currentTime;
+        sirenBus1.gain.setTargetAtTime(0.15, t, 0.02);
+        sirenBus2.gain.setTargetAtTime(0.15, t, 0.02);
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("当前浏览器环境不支持麦克风调用");
+          return;
+        }
+
+        navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        }).then(function (stream) {
+          micStream = stream;
+
+          if (paMode === "live") {
+            micSourceNode = ctx.createMediaStreamSource(stream);
+            micSourceNode.connect(micBus);
+          } else {
+            paRecordChunks = [];
+            try {
+              paRecorder = new MediaRecorder(stream);
+              paRecorder.ondataavailable = function (e) { if (e.data && e.data.size) paRecordChunks.push(e.data); };
+              paRecorder.onstop = playRecordedPA;
+              paRecorder.start();
+            } catch (err) {
+              console.warn("MediaRecorder 不可用，回退实时:", err);
+              micSourceNode = ctx.createMediaStreamSource(stream);
+              micSourceNode.connect(micBus);
+              paMode = "live";
+              config.paMode = "live";
+              saveConfig();
+            }
+          }
+
+          isMicActive = true;
+          document.getElementById("btnMic").classList.add("pressed");
+          document.getElementById("micSubTxt").innerText =
+            (paMode === "live") ? i18n[currentLang].subMicActive : i18n[currentLang].micRecording;
+          updateUI();
+        }).catch(function (err) {
+          console.warn("麦克风权限受阻:", err);
+        });
+      }
+
+      function stopMicPA() {
+        if (!isMicActive) return;
+        isMicActive = false;
+
+        if (paMode === "live") {
+          if (micSourceNode) { try { micSourceNode.disconnect(); } catch (e) { } micSourceNode = null; }
+          if (micStream) { micStream.getTracks().forEach(function (tk) { tk.stop(); }); micStream = null; }
+        } else {
+          if (paRecorder && paRecorder.state === "recording") {
+            paRecorder.stop();
+          }
+        }
+
+        var t = ctx.currentTime;
+        var targetVol = isLowPower ? 0.25 : 1.0;
+        sirenBus1.gain.setTargetAtTime(targetVol, t, 0.04);
+        sirenBus2.gain.setTargetAtTime(targetVol, t, 0.04);
+
+        document.getElementById("btnMic").classList.remove("pressed");
+        document.getElementById("micSubTxt").innerText =
+          (paMode === "live") ? i18n[currentLang].subMicLive : i18n[currentLang].subMicRec;
+        updateUI();
+      }
+
+      function playRecordedPA() {
+        if (micStream) { micStream.getTracks().forEach(function (tk) { tk.stop(); }); micStream = null; }
+        paRecorder = null;
+
+        if (paRecordChunks.length === 0) return;
+
+        var mimeType = (paRecordChunks[0] && paRecordChunks[0].type) || "audio/webm";
+        var blob = new Blob(paRecordChunks, { type: mimeType });
+        paRecordChunks = [];
+        var url = URL.createObjectURL(blob);
+
+        fetch(url)
+          .then(function (r) { return r.arrayBuffer(); })
+          .then(function (ab) {
+            return new Promise(function (resolve) {
+              ctx.decodeAudioData(ab, function (buf) { resolve(buf); }, function () { resolve(null); });
+            });
+          })
+          .then(function (buf) {
+            URL.revokeObjectURL(url);
+            if (!buf) { console.warn("录音解码失败"); return; }
+
+            var src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.connect(micBus);
+
+            var t = ctx.currentTime;
+            sirenBus1.gain.setTargetAtTime(0.10, t, 0.03);
+            sirenBus2.gain.setTargetAtTime(0.10, t, 0.03);
+
+            src.onended = function () {
+              try { src.disconnect(); } catch (e) { }
+              var t2 = ctx.currentTime;
+              var vol = isLowPower ? 0.25 : 1.0;
+              sirenBus1.gain.setTargetAtTime(vol, t2, 0.06);
+              sirenBus2.gain.setTargetAtTime(vol, t2, 0.06);
+            };
+
+            src.start(t);
+          })
+          .catch(function (err) {
+            console.warn("PA 回放失败:", err);
+            URL.revokeObjectURL(url);
+          });
+      }
+
+      var leds = [];
+      for (var li = 0; li < 10; li++) {
+        leds.push(document.getElementById("led" + li));
+      }
+
+      function set10LedState(arr) {
+        for (var i = 0; i < 10; i++) {
+          leds[i].classList.toggle("on", !!arr[i]);
+        }
+      }
+
+      function renderLEDEngine() {
+        var now = performance.now();
+
+        if (hornVoiceNodes.length > 0 || manualHighCtrl.state !== "idle" || manualLowCtrl.state !== "idle" || isMicActive) {
+          var tBurst = Math.floor(now / 80) % 4;
+          if (tBurst === 0) {
+            set10LedState([1, 1, 1, 1, 1, 1, 1, 0, 0, 0]);
+          } else if (tBurst === 2) {
+            set10LedState([0, 0, 0, 1, 1, 1, 1, 1, 1, 1]);
+          } else {
+            set10LedState([0, 0, 0, 0, 1, 1, 0, 0, 0, 0]);
+          }
+          requestAnimationFrame(renderLEDEngine);
+          return;
+        }
+
+        if (isStopLightActive) {
+          var pStop = now % 1200;
+          var amberPulse = (pStop < 600) ? 1 : 0;
+          set10LedState([0, 0, 0, amberPulse, 1, 1, amberPulse, 0, 0, 0]);
+          requestAnimationFrame(renderLEDEngine);
+          return;
+        }
+
+        var mode = activeLightMode;
+
+        if (mode === "mode1") {
+          var p1 = now % 1000;
+          if (p1 < 500) {
+            set10LedState([1, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+          } else {
+            set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+          }
+          requestAnimationFrame(renderLEDEngine);
+          return;
+        }
+
+        if (mode === "mode2") {
+          var p2 = now % 650;
+          if (p2 < 325) {
+            if ((p2 >= 0 && p2 < 70) || (p2 >= 130 && p2 < 200)) {
+              set10LedState([1, 1, 1, 1, 0, 0, 0, 0, 0, 0]);
+            } else {
+              set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            }
+          } else {
+            var p2R = p2 - 325;
+            if ((p2R >= 0 && p2R < 70) || (p2R >= 130 && p2R < 200)) {
+              set10LedState([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
+            } else {
+              set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            }
+          }
+          requestAnimationFrame(renderLEDEngine);
+          return;
+        }
+
+        if (mode === "mode3") {
+          renderExtendedTacticalPattern(now);
+          requestAnimationFrame(renderLEDEngine);
+          return;
+        }
+
+        if (mode === "auto") {
+          if (!currentMode) {
+            var pStd = now % 1400;
+            var arrStd = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            if (pStd < 70) arrStd[0] = 1;
+            if (pStd >= 700 && pStd < 770) arrStd[9] = 1;
+            set10LedState(arrStd);
+          } else if (currentMode === "wail" || currentMode === "wail_slow" || currentMode === "wail_fast") {
+            var pw = now % 900;
+            if (pw < 450) {
+              set10LedState([1, 1, 1, 1, 0, 0, 0, 0, 0, 0]);
+            } else {
+              set10LedState([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
+            }
+          } else if (currentMode === "yelp" || currentMode === "priority" || currentMode === "phaser") {
+            var py = now % 800;
+            if (py < 400) {
+              var subY = py % 80;
+              if (py < 320 && subY < 40) {
+                set10LedState([1, 1, 1, 1, 1, 0, 0, 0, 0, 0]);
+              } else {
+                set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+              }
+            } else {
+              var pyR = py - 400;
+              var subYR = pyR % 80;
+              if (pyR < 320 && subYR < 40) {
+                set10LedState([0, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
+              } else {
+                set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+              }
+            }
+          } else if (currentMode === "warble") {
+            var pwb = Math.floor(now / 70) % 4;
+            if (pwb === 0) set10LedState([1, 0, 1, 1, 1, 0, 0, 0, 1, 0]);
+            else if (pwb === 2) set10LedState([0, 1, 0, 0, 0, 1, 1, 1, 0, 1]);
+            else set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+          } else if (currentMode === "hilo") {
+            var ph = now % 1000;
+            if (ph < 500) set10LedState([1, 1, 1, 0, 0, 0, 0, 0, 0, 0]);
+            else set10LedState([0, 0, 0, 0, 0, 0, 0, 1, 1, 1]);
+          } else {
+            renderExtendedTacticalPattern(now);
+          }
+          requestAnimationFrame(renderLEDEngine);
+        }
+      }
+
+      function renderExtendedTacticalPattern(now) {
+        var t = now % 3600;
+        if (t < 800) {
+          if ((t >= 0 && t < 80) || (t >= 140 && t < 220) || (t >= 280 && t < 360) || (t >= 420 && t < 500)) {
+            set10LedState([1, 1, 1, 1, 0, 0, 0, 0, 0, 0]);
+          } else {
+            set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+          }
+          return;
+        }
+        if (t >= 800 && t < 1600) {
+          var tR = t - 800;
+          if ((tR >= 0 && tR < 80) || (tR >= 140 && tR < 220) || (tR >= 280 && tR < 360) || (tR >= 420 && tR < 500)) {
+            set10LedState([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
+          } else {
+            set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+          }
+          return;
+        }
+        if (t >= 1600 && t < 2800) {
+          var tAlt = (t - 1600) % 240;
+          if (tAlt < 120) {
+            set10LedState([1, 1, 1, 1, 0, 0, 0, 0, 0, 0]);
+          } else {
+            set10LedState([0, 0, 0, 0, 0, 0, 1, 1, 1, 1]);
+          }
+          return;
+        }
+        if (t >= 2800) {
+          var tAll = t - 2800;
+          if ((tAll >= 0 && tAll < 90) || (tAll >= 170 && tAll < 260) || (tAll >= 340 && tAll < 430) || (tAll >= 510 && tAll < 600)) {
+            set10LedState([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+          } else {
+            set10LedState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+          }
+          return;
+        }
+      }
+
+      requestAnimationFrame(renderLEDEngine);
+
+      function setLightMode(mode) {
+        isStopLightActive = false;
+        document.getElementById("btnStopLight").classList.remove("active");
+
+        activeLightMode = mode;
+        document.getElementById("btnLgtAuto").classList.toggle("active", mode === "auto");
+        document.getElementById("btnLgtM1").classList.toggle("active", mode === "mode1");
+        document.getElementById("btnLgtM2").classList.toggle("active", mode === "mode2");
+        document.getElementById("btnLgtM3").classList.toggle("active", mode === "mode3");
+      }
+
+      function toggleStopLight() {
+        isStopLightActive = !isStopLightActive;
+        document.getElementById("btnStopLight").classList.toggle("active", isStopLightActive);
+        if (isStopLightActive) {
+          document.getElementById("btnLgtAuto").classList.remove("active");
+          document.getElementById("btnLgtM1").classList.remove("active");
+          document.getElementById("btnLgtM2").classList.remove("active");
+          document.getElementById("btnLgtM3").classList.remove("active");
+        } else {
+          setLightMode(activeLightMode);
+        }
+      }
+
+      var autoPool = [
+        { mode: "wail", name: "巡航" },
+        { mode: "yelp", name: "急促" },
+        { mode: "phaser", name: "穿透" },
+        { mode: "warble", name: "颤音" }
+      ];
+
+      function pickNextRandomAuto() {
+        var candidates = autoPool.filter(function (item) { return item.mode !== lastAutoMode; });
+        return candidates[Math.floor(Math.random() * candidates.length)];
+      }
+
+      function runAutoCycleStep() {
+        if (!isAutoCycle) return;
+        var next = pickNextRandomAuto();
+        lastAutoMode = next.mode;
+
+        playSingle(next.mode, true);
+
+        var subText = document.getElementById("autoSubText");
+        if (subText) subText.innerText = (currentLang === "zh" ? "自动中: " : "Auto: ") + next.name;
+
+        autoTimer = setTimeout(runAutoCycleStep, 5000);
+      }
+
+      function toggleAutoCycle() {
+        ensureCtx();
+        isAutoCycle = !isAutoCycle;
+        if (isAutoCycle) {
+          lastAutoMode = "";
+          runAutoCycleStep();
+        } else {
+          if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+          var subText = document.getElementById("autoSubText");
+          if (subText) subText.innerText = i18n[currentLang].subAuto;
+          stopAllSirens();
+        }
+        updateUI();
+      }
+
+      function playSingle(key, keepAuto) {
+        ensureCtx();
+        if (!keepAuto && isAutoCycle) {
+          isAutoCycle = false;
+          if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+          var subText = document.getElementById("autoSubText");
+          if (subText) subText.innerText = i18n[currentLang].subAuto;
+        }
+
+        if (currentMode === key && !isAutoCycle) { stopAllSirens(); return; }
+        stopAllSirens(true);
+        currentMode = key;
+
+        var t = ctx.currentTime + 0.025;
+        sirenBus1.gain.setValueAtTime(0.001, t);
+        sirenBus1.gain.linearRampToValueAtTime(isLowPower ? 0.25 : 1.0, t + 0.015);
+
+        var cfg = getSirenToneConfig(key);
+        cfg._t0 = t;
+
+        var v = startOscillatorVoice(sirenBus1, sirenWave, 0.88, t);
+        applyTonePattern(v.osc, cfg, t);
+        activeVoices.push(v);
+
+        activeToneStateList = [cfg];
+        if (isHowlerArmed && !hornVoiceNodes.length) {
+          syncRumblerToActiveState(t);
+        }
+        updateUI();
+      }
+
+      function playDual(keysStr) {
+        ensureCtx();
+        if (isAutoCycle) {
+          isAutoCycle = false;
+          if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+          var subText = document.getElementById("autoSubText");
+          if (subText) subText.innerText = i18n[currentLang].subAuto;
+        }
+
+        if (currentMode === keysStr) { stopAllSirens(); return; }
+        stopAllSirens(true);
+        currentMode = keysStr;
+
+        var t = ctx.currentTime + 0.025;
+        var targetVol = isLowPower ? 0.25 : 1.0;
+
+        sirenBus1.gain.setValueAtTime(targetVol, t);
+        sirenBus2.gain.setValueAtTime(targetVol, t);
+
+        var modes = keysStr.split(",");
+        var cfg1 = getSirenToneConfig(modes[0]);
+        var cfg2 = getSirenToneConfig(modes[1]);
+        cfg1._t0 = t;
+        cfg2._t0 = t;
+
+        var v1 = startOscillatorVoice(sirenBus1, sirenWave, 0.72, t);
+        applyTonePattern(v1.osc, cfg1, t);
+        activeVoices.push(v1);
+
+        var v2 = startOscillatorVoice(sirenBus2, sirenWave, 0.72, t);
+        applyTonePattern(v2.osc, cfg2, t);
+        activeVoices.push(v2);
+
+        activeToneStateList = [cfg2];
+        if (isHowlerArmed && !hornVoiceNodes.length) {
+          syncRumblerToActiveState(t);
+        } else {
+          stopRumblerNow();
+        }
+        updateUI();
+      }
+
+      function stopAllSirens(silent) {
+        activeVoices.forEach(function (v) { v.stop(0.03); });
+        activeVoices = [];
+        currentMode = null;
+
+        activeToneStateList = [];
+        stopRumblerNow();
+        stopHornRumbler();
+        if (!silent) updateUI();
+      }
+
+      function stopAll() {
+        if (isAutoCycle) {
+          isAutoCycle = false;
+          if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+          var subText = document.getElementById("autoSubText");
+          if (subText) subText.innerText = i18n[currentLang].subAuto;
+        }
+        stopAllSirens(true);
+        cleanupHornVoices();
+        stopHornRumbler();
+        manualHighCtrl.stop();
+        manualLowCtrl.stop();
+        stopMicPA();
+        stopRumblerNow();
+        isHowlerArmed = false;
+        updateUI();
+      }
+
+      function toggleLowPower() {
+        ensureCtx();
+        isLowPower = !isLowPower;
+        var tg = isLowPower ? 0.25 : 1.0;
+        masterPreEQ.gain.setTargetAtTime(tg * 0.70, ctx.currentTime, 0.04);
+        updateUI();
+      }
+
+      function openModal() {
+        document.getElementById("modalOverlay").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("modalOverlay").classList.remove("open");
+      }
+
+      function updateUI() {
+        document.querySelectorAll("[data-siren]").forEach(function (b) {
+          b.classList.toggle("active", b.dataset.siren === currentMode);
+        });
+        document.querySelectorAll("[data-dual]").forEach(function (b) {
+          b.classList.toggle("active", b.dataset.dual === currentMode);
+        });
+
+        var btnAuto = document.getElementById("btnAutoCycle");
+        if (btnAuto) btnAuto.classList.toggle("active", isAutoCycle);
+
+        var bh = document.getElementById("btnHowler");
+        var subTxt = document.getElementById("rumblerSubText");
+        var d = i18n[currentLang];
+        if (isHowlerArmed) {
+          var isActuallySounding = rumblerVoices.length > 0 || hornRumblerVoice;
+          bh.classList.toggle("armed", !isActuallySounding);
+          bh.classList.toggle("active", isActuallySounding);
+          subTxt.innerText = isActuallySounding ? d.subPulseActive : d.subPulseArmed;
+        } else {
+          bh.classList.remove("armed", "active");
+          subTxt.innerText = d.subPulseIdle;
+        }
+
+        document.getElementById("btnLowPower").classList.toggle("active", isLowPower);
+        var led = document.getElementById("sysLed");
+        var running = !!(currentMode || hornVoiceNodes.length || manualHighCtrl.state !== "idle" || manualLowCtrl.state !== "idle" || rumblerVoices.length > 0 || hornRumblerVoice || isAutoCycle || isMicActive || isStopLightActive);
+        led.classList.toggle("active", running);
+      }
+
+      function syncUIFromConfig() {
+        document.getElementById("rngReverb").value = config.reverb;
+        document.getElementById("valReverb").innerText = Math.round(config.reverb * 100) + "%";
+
+        document.getElementById("rngLow").value = config.low;
+        document.getElementById("valLow").innerText = (config.low > 0 ? "+" : "") + config.low + "dB";
+
+        document.getElementById("rngMid").value = config.mid;
+        document.getElementById("valMid").innerText = (config.mid > 0 ? "+" : "") + config.mid + "dB";
+
+        document.getElementById("rngHigh").value = config.high;
+        document.getElementById("valHigh").innerText = (config.high > 0 ? "+" : "") + config.high + "dB";
+
+        document.getElementById("btnPALive").classList.toggle("active", config.paMode === "live");
+        document.getElementById("btnPARecord").classList.toggle("active", config.paMode === "record");
+
+        if (ctx) {
+          wetGain.gain.setValueAtTime(config.reverb, ctx.currentTime);
+          dryGain.gain.setValueAtTime(Math.max(0.05, 1.0 - config.reverb * 0.7), ctx.currentTime);
+          eqLow.gain.setValueAtTime(config.low, ctx.currentTime);
+          eqMid.gain.setValueAtTime(config.mid, ctx.currentTime);
+          eqHigh.gain.setValueAtTime(config.high, ctx.currentTime);
+        }
+      }
+
+      var toastTimer = null;
+      function showToast(htmlMsg) {
+        var box = document.getElementById("toastBox");
+        box.innerHTML = htmlMsg;
+        box.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          box.classList.remove("show");
+        }, 2400);
+      }
+
+      /* 启动免责阻断逻辑 */
+      document.getElementById("btnDiscAgree").addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        ensureCtx();
+        var disc = document.getElementById("disclaimerModal");
+        if (disc) {
+          disc.style.display = "none";
+        }
+      });
+
+      document.getElementById("btnDiscRefuse").addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (navigator.app && navigator.app.exitApp) {
+          navigator.app.exitApp();
+        } else if (navigator.device && navigator.device.exitApp) {
+          navigator.device.exitApp();
+        } else {
+          window.close();
+          document.body.innerHTML = "<div style=\"color:#ff5555;font-size:16px;text-align:center;padding:40px;line-height:1.8;font-weight:800\">已拒绝许可协议<br><span style=\"color:#94a3b8;font-size:13px;font-weight:400\">无法进入软件，请直接关闭窗口或划掉 App。</span></div>";
+        }
+      });
+
+      ["click", "touchstart", "pointerdown"].forEach(function (e) { window.addEventListener(e, ensureCtx, { once: true }); });
+
+      function bindHold(id, onDown, onUp) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var isDown = false;
+        el.addEventListener("pointerdown", function (e) {
+          e.preventDefault();
+          if (isDown) return;
+          isDown = true;
+          el.classList.add("pressed");
+          onDown();
+        });
+        el.addEventListener("pointerup", function (e) {
+          e.preventDefault();
+          if (!isDown) return;
+          isDown = false;
+          el.classList.remove("pressed");
+          onUp();
+        });
+        el.addEventListener("pointerleave", function (e) {
+          e.preventDefault();
+          if (!isDown) return;
+          isDown = false;
+          el.classList.remove("pressed");
+          onUp();
+        });
+        el.addEventListener("pointercancel", function (e) {
+          e.preventDefault();
+          if (!isDown) return;
+          isDown = false;
+          el.classList.remove("pressed");
+          onUp();
+        });
+      }
+
+      bindHold("btnHorn", hornPress, resumeMainSirenFromScratch);
+      bindHold("btnMic", startMicPA, stopMicPA);
+
+      bindHold("btnManualHigh", function () { manualHighCtrl.press(); }, function () { manualHighCtrl.release(); });
+      bindHold("btnManualLow", function () { manualLowCtrl.press(); }, function () { manualLowCtrl.release(); });
+
+      document.querySelectorAll("[data-siren]").forEach(function (b) {
+        b.addEventListener("click", function () { playSingle(b.dataset.siren); });
+      });
+      document.querySelectorAll("[data-dual]").forEach(function (b) {
+        b.addEventListener("click", function () { playDual(b.dataset.dual); });
+      });
+
+      document.getElementById("btnAutoCycle").addEventListener("click", toggleAutoCycle);
+      document.getElementById("btnHowler").addEventListener("click", toggleHowler);
+      document.getElementById("btnLowPower").addEventListener("click", toggleLowPower);
+      document.getElementById("btnStop").addEventListener("click", stopAll);
+
+      document.getElementById("btnLgtAuto").addEventListener("click", function () { setLightMode("auto"); });
+      document.getElementById("btnLgtM1").addEventListener("click", function () { setLightMode("mode1"); });
+      document.getElementById("btnLgtM2").addEventListener("click", function () { setLightMode("mode2"); });
+      document.getElementById("btnLgtM3").addEventListener("click", function () { setLightMode("mode3"); });
+      document.getElementById("btnStopLight").addEventListener("click", toggleStopLight);
+
+      document.getElementById("btnSettings").addEventListener("click", openModal);
+      document.getElementById("btnCloseModal").addEventListener("click", closeModal);
+      document.getElementById("modalOverlay").addEventListener("click", function (e) {
+        if (e.target === this) closeModal();
+      });
+
+      document.getElementById("btnPALive").addEventListener("click", function () {
+        paMode = "live";
+        config.paMode = "live";
+        saveConfig();
+        document.getElementById("btnPALive").classList.add("active");
+        document.getElementById("btnPARecord").classList.remove("active");
+        if (!isMicActive) document.getElementById("micSubTxt").innerText = i18n[currentLang].subMicLive;
+      });
+      document.getElementById("btnPARecord").addEventListener("click", function () {
+        paMode = "record";
+        config.paMode = "record";
+        saveConfig();
+        document.getElementById("btnPARecord").classList.add("active");
+        document.getElementById("btnPALive").classList.remove("active");
+        if (!isMicActive) document.getElementById("micSubTxt").innerText = i18n[currentLang].subMicRec;
+      });
+
+      document.getElementById("btnLangZh").addEventListener("click", function () { applyLanguage("zh"); });
+      document.getElementById("btnLangEn").addEventListener("click", function () { applyLanguage("en"); });
+
+      document.getElementById("rngReverb").addEventListener("input", function (e) {
+        ensureCtx();
+        var v = parseFloat(e.target.value);
+        config.reverb = v;
+        saveConfig();
+        wetGain.gain.setValueAtTime(v, ctx.currentTime);
+        dryGain.gain.setValueAtTime(Math.max(0.05, 1.0 - v * 0.7), ctx.currentTime);
+        document.getElementById("valReverb").innerText = Math.round(v * 100) + "%";
+      });
+      document.getElementById("rngLow").addEventListener("input", function (e) {
+        ensureCtx();
+        var v = parseFloat(e.target.value);
+        config.low = v;
+        saveConfig();
+        eqLow.gain.setValueAtTime(v, ctx.currentTime);
+        document.getElementById("valLow").innerText = (v > 0 ? "+" : "") + v + "dB";
+      });
+      document.getElementById("rngMid").addEventListener("input", function (e) {
+        ensureCtx();
+        var v = parseFloat(e.target.value);
+        config.mid = v;
+        saveConfig();
+        eqMid.gain.setValueAtTime(v, ctx.currentTime);
+        document.getElementById("valMid").innerText = (v > 0 ? "+" : "") + v + "dB";
+      });
+      document.getElementById("rngHigh").addEventListener("input", function (e) {
+        ensureCtx();
+        var v = parseFloat(e.target.value);
+        config.high = v;
+        saveConfig();
+        eqHigh.gain.setValueAtTime(v, ctx.currentTime);
+        document.getElementById("valHigh").innerText = (v > 0 ? "+" : "") + v + "dB";
+      });
+
+      document.getElementById("btnResetDefaults").addEventListener("click", function () {
+        ensureCtx();
+        config = Object.assign({}, DEFAULT_CONFIG);
+        saveConfig();
+        applyLanguage(config.lang);
+        syncUIFromConfig();
+      });
+
+      window.addEventListener("blur", function () { if (!isHowlerArmed && !isMicActive && !isStopLightActive) stopAll(); });
+      document.addEventListener("visibilitychange", function () { if (document.hidden && !isHowlerArmed && !isMicActive && !isStopLightActive) stopAll(); });
+
+      applyLanguage(config.lang);
+      syncUIFromConfig();
+
+    })();
+  </script>
+</body>
+
+</html>
